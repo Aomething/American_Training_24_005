@@ -1,16 +1,86 @@
 # This Python file uses the following encoding: utf-8
 import sys
+import time
+import random
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 
 
-
+# window size
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 450
 
+# GAME SETTINGS and Global Variables
+
+# track which objects are in each slot
+starSlot = None
+circleSlot = None
+triangleSlot = None
+squareSlot = None
+
+# current shape and color being prompted
+promptObject = None
+
+# general settings
+shapeNumber = None
+colorNumber = None
+timePerRound = None
+totalPrompts = None
+
+# shape IDs
+redStar = None
+redCircle = None
+redTriangle = None
+redSquare = None
+
+yellowStar = None
+yellowCircle = None
+yellowTriangle = None
+yellowSquare = None
+
+greenStar = None
+greenCircle = None
+greenTriangle = None
+greenSquare = None
+
+blueStar = None
+blueCircle = None
+blueTriangle = None
+blueSquare = None
+
+redList = redStar, redCircle, redTriangle, redSquare
+yellowList = yellowStar, yellowCircle, yellowTriangle, yellowSquare
+greenList = greenSquare, greenCircle, greenTriangle, greenSquare
+blueList = blueStar, blueCircle, blueTriangle, blueSquare
+
+starList = redStar, yellowStar, greenStar, blueStar
+circleList = redCircle, yellowCircle, greenCircle, blueCircle
+triangleList = redTriangle, yellowTriangle, greenTriangle, blueTriangle
+squareList = redSquare, yellowSquare, greenSquare, blueSquare
+
+shapeListConst = [0,1,2,3]
+colorListConst = [0,1,2,3]
+
+shapeListPool = [0]
+colorListPool = [0]
+
+# SHAPES:
+# 0 = Star
+# 1 = Circle
+# 2 = Triangle
+# 3 = Square
+
+# COLORS:
+# 0 = Red
+# 1 = Yellow
+# 2 = Green
+# 3 = Blue
+
+
 class SettingsWidget(QWidget):
     def __init__(self):
-        super().__init__()
+        super().__init__() 
 
         programRunning = True
 
@@ -165,11 +235,6 @@ class SettingsWidget(QWidget):
         self.PromptLabelRight.setParent(self)
         self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-
-        def StartGame():
-            print("--Test--")
-            programRunning = False
             
         def updateShapeLabel():
             self.ShapeLabel.setText("Number of Shapes: " + str(self.ShapeSlider.value()))
@@ -186,19 +251,193 @@ class SettingsWidget(QWidget):
         def updatePromptLabel():
             self.PromptLabel.setText("Number of Rounds: " + str(self.PromptSlider.value()))
 
-
-        self.SettingsStartButton.clicked.connect(StartGame)
         self.ShapeSlider.valueChanged.connect(updateShapeLabel)
         self.ColorSlider.valueChanged.connect(updateColorLabel)
         self.TimerSlider.valueChanged.connect(updateTimerLabel)
         self.PromptSlider.valueChanged.connect(updatePromptLabel)
 
+class GameWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.starImage = QLabel(parent=self)
+        self.circleImage = QLabel(parent=self)
+        self.triangleImage = QLabel(parent=self)
+        self.squareImage = QLabel(parent=self)
+
+        self.debug_button = QPushButton("Next Prompt (Debug)")
+        
+        self.colorStar = QPixmap("./grayStar.png")
+        self.colorStar2 = self.colorStar.scaled(100,100)
+        self.starImage.setPixmap(self.colorStar2)
+        self.starImage.show()
+        self.starImage.setFixedSize(150,150)
+        self.starImage.move(125,37.5)
+
+        self.colorCircle = QPixmap("./grayCircle.png")
+        self.colorCircle2 = self.colorCircle.scaled(100,100)
+        self.circleImage.setPixmap(self.colorCircle2)
+        self.circleImage.show()
+        self.circleImage.setFixedSize(150,150)
+        self.circleImage.move(525,37.5)
+
+        self.colorTriangle = QPixmap("./grayTriangle.png")
+        self.colorTriangle2 = self.colorTriangle.scaled(100,100)
+        self.triangleImage.setPixmap(self.colorTriangle2)
+        self.triangleImage.show()
+        self.triangleImage.setFixedSize(150,150)
+        self.triangleImage.move(125,225)
+
+        self.colorSquare = QPixmap("./graySquare.png")
+        self.colorSquare2 = self.colorSquare.scaled(100,100)
+        self.squareImage.setPixmap(self.colorSquare2)
+        self.squareImage.show()
+        self.squareImage.setFixedSize(150,150)
+        self.squareImage.move(525,225)
+
+        # generates a new random shape and color
+        def newPrompt():
+            global shapeListPool
+            global colorListPool
+
+            global redList
+            global yellowList
+            global greenList
+            global blueList
+
+            global starList
+            global circleList
+            global triangleList
+            global squareList
+
+            randomColor = shapeListPool[random.randint(0,len(shapeListPool)-1)]
+            randomShape = colorListPool[random.randint(0,len(colorListPool)-1)]
+
+            print("-----------------")
+            if (randomColor == 0):
+                print("Color: Red")
+            elif (randomColor == 1):
+                print("Color: Yellow")
+            elif (randomColor == 2):
+                print("Color: Green")
+            elif (randomColor == 3):
+                print("Color: Blue")
+
+            if (randomShape == 0):
+                print("Shape: Star")
+            elif (randomShape == 1):
+                print("Shape: Circle")
+            elif (randomShape == 2):
+                print("Shape: Triangle")
+            elif (randomShape == 3):
+                print("Shape: Square")
+
+
+        def read_RFID_daemon():
+            print("test")
+
+
+        def checkSlot(slot):
+            print("test")
+            # shape IDs
+            global starSlot
+            global circleSlot
+            global triangleSlot
+            global squareSlot
+
+            global redStar
+            global redCircle
+            global redTriangle
+            global redSquare
+
+            global yellowStar
+            global yellowCircle
+            global yellowTriangle
+            global yellowSquare
+
+            global blueStar
+            global blueCircle
+            global blueTriangle
+            global blueSquare
+
+            global greenStar
+            global greenCircle
+            global greenTriangle
+            global greenSquare
+        
+        self.debug_button.clicked.connect(newPrompt)
+
+    
+
 class WindowSystem(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # Window Manager
+        # Make an instance of the settings menu
         self.Settings = SettingsWidget()
         self.Settings.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
         self.Settings.show()
+
+        # Make an instance of the game menu
+        self.Game = GameWidget()
+        self.Game.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
+        self.Game.hide() 
+
+        def StartGame():
+
+            # hide settings menu, show game menu, grab appropriate globals and constants to set up the game with
+            print("--Test 1--")
+            programRunning = True
+            self.Game.show()
+            self.Settings.hide()
+
+            global shapeListConst
+            global colorListConst
+
+            global shapeListPool
+            global colorListPool
+
+            tempColorList = colorListConst
+            tempShapeList = shapeListConst
+
+            global shapeNumber
+            global colorNumber
+            global timePerRound
+            global totalPrompts
+
+            colorNumber = self.Settings.ColorSlider.value()
+            shapeNumber = self.Settings.ShapeSlider.value()
+            totalPrompts = self.Settings.PromptSlider.value()
+            timePerRound = self.Settings.TimerSlider.value()
+
+            tempColor = random.randint(0,3)
+            tempShape = random.randint(0,3)
+
+            print("Number of Colors: ", colorNumber)
+            print("Numnber of Shapes: ", shapeNumber)
+            print("Time Per Round: ", timePerRound)
+            print("Number of Rounds: ", totalPrompts)
+
+            
+
+            #print("\nColors Options:")
+            #for i in colorListPool:
+            #    print(colorListPool[i])
+
+            #print("\nShape Options:")
+            #for i in shapeListPool:
+            #    print(shapeListPool[i])
+
+
+
+        def EndGame():
+            print("--Test 2--")
+            programRunning = False
+            self.Game.hide()
+            self.Settings.show()
+
+        self.Settings.SettingsStartButton.clicked.connect(StartGame)
+        #self.Game.button1.clicked.connect(EndGame)
 
         
 
