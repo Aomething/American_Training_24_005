@@ -213,7 +213,7 @@ class SettingsWidget(QWidget):
         self.testFont = self.TimerLabel.font()
         self.testFont.setPointSize(15)
         self.TimerLabel.setFont(self.testFont)
-        
+
 
         # Settings Menu Slider 3 - End Labels ('1' and '4')
         self.TimerLabelLeft = QLabel("30 Sec")
@@ -322,28 +322,28 @@ class GameWidget(QWidget):
         self.debug_button.setParent(self)
         self.debug_button.show()
         
-        self.colorStar = QPixmap("./grayStar.png")
+        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
         self.colorStar2 = self.colorStar.scaled(150,150)
         self.starImage.setPixmap(self.colorStar2)
         self.starImage.show()
         self.starImage.setFixedSize(150,150)
         self.starImage.move(125,37)
 
-        self.colorCircle = QPixmap("./grayCircle.png")
+        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
         self.colorCircle2 = self.colorCircle.scaled(150,150)
         self.circleImage.setPixmap(self.colorCircle2)
         self.circleImage.show()
         self.circleImage.setFixedSize(150,150)
         self.circleImage.move(525,37)
 
-        self.colorTriangle = QPixmap("./grayTriangle.png")
+        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
         self.colorTriangle2 = self.colorTriangle.scaled(150,150)
         self.triangleImage.setPixmap(self.colorTriangle2)
         self.triangleImage.show()
         self.triangleImage.setFixedSize(150,150)
         self.triangleImage.move(125,225)
 
-        self.colorSquare = QPixmap("./graySquare.png")
+        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
         self.colorSquare2 = self.colorSquare.scaled(150,150)
         self.squareImage.setPixmap(self.colorSquare2)
         self.squareImage.show()
@@ -366,7 +366,7 @@ class GameWidget(QWidget):
 
 
         self.RoundTimer = QTimer(parent=self)
-        self.RoundTimer.setInterval(1000)        
+        self.RoundTimer.setInterval(1000)
 
         def updateTimer():
             #print("Timer event triggered!")
@@ -469,37 +469,37 @@ class GameWidget(QWidget):
                         promptObject = redStar
                         promptColor = 0
                         promptShape = 0
-                        self.colorStar = QPixmap("./redStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 0 and randomShape == 1):
                         #print("Prompt: Red Circle")
                         promptObject = redCircle
                         promptColor = 0
                         promptShape = 1
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./redCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 0 and randomShape == 2):
                         #print("Prompt: Red Triangle")
                         promptObject = redTriangle
                         promptColor = 0
                         promptShape = 2
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./redTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 0 and randomShape == 3):
                         #print("Prompt: Red Square")
                         promptObject = redSquare
                         promptColor = 0
                         promptShape = 3
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./redSquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedSquare.png")
 
                     # YELLOW SHAPES
                     elif (randomColor == 1 and randomShape == 0):
@@ -507,37 +507,37 @@ class GameWidget(QWidget):
                         promptObject = yellowStar
                         promptColor = 1
                         promptShape = 0
-                        self.colorStar = QPixmap("./yellowStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 1 and randomShape == 1):
                         #print("Prompt: Yellow Circle")
                         promptObject = yellowCircle
                         promptColor = 1
                         promptShape = 1
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./yellowCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 1 and randomShape == 2):
                         #print("Prompt: Yellow Triangle")
                         promptObject = yellowTriangle
                         promptColor = 1
                         promptShape = 2
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./yellowTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 1 and randomShape == 3):
                         #print("Prompt: Yellow Square")
                         promptObject = yellowSquare
                         promptColor = 1
                         promptShape = 3
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./yellowSquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowSquare.png")
 
                     # GREEN SHAPES
                     elif (randomColor == 2 and randomShape == 0):
@@ -545,37 +545,37 @@ class GameWidget(QWidget):
                         promptObject = greenStar
                         promptColor = 2
                         promptShape = 0
-                        self.colorStar = QPixmap("./greenStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 2 and randomShape == 1):
                         #print("Prompt: Green Circle")
                         promptObject = greenCircle
                         promptColor = 2
                         promptShape = 1
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./greenCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 2 and randomShape == 2):
                         #print("Prompt: Green Triangle")
                         promptObject = greenTriangle
                         promptColor = 2
                         promptShape = 2
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./greenTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 2 and randomShape == 3):
                         #print("Prompt: Green Square")
                         promptObject = greenSquare
                         promptColor = 2
                         promptShape = 3
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./greenSquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenSquare.png")
 
                     # BLUE SHAPES
                     elif (randomColor == 3 and randomShape == 0):
@@ -583,37 +583,37 @@ class GameWidget(QWidget):
                         promptObject = blueStar
                         promptColor = 3
                         promptShape = 0
-                        self.colorStar = QPixmap("./blueStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 3 and randomShape == 1):
                         #print("Prompt: Blue Circle")
                         promptObject = blueCircle
                         promptColor = 3
                         promptShape = 1
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./blueCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 3 and randomShape == 2):
                         #print("Prompt: Blue Triangle")
                         promptObject = blueTriangle
                         promptColor = 3
                         promptShape = 2
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./blueTriangle.png")
-                        self.colorSquare = QPixmap("./graySquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
                     elif (randomColor == 3 and randomShape == 3):
                         #print("Prompt: Blue Square")
                         promptObject = blueSquare
                         promptColor = 3
                         promptShape = 3
-                        self.colorStar = QPixmap("./grayStar.png")
-                        self.colorCircle = QPixmap("./grayCircle.png")
-                        self.colorTriangle = QPixmap("./grayTriangle.png")
-                        self.colorSquare = QPixmap("./blueSquare.png")
+                        self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+                        self.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+                        self.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+                        self.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueSquare.png")
 
                     # update the images
                     self.colorStar2 = self.colorStar.scaled(150,150)
@@ -830,10 +830,10 @@ class WindowSystem(QMainWindow):
             currentRound = 0
             currentTimer = 0
 
-            self.Game.colorStar = QPixmap("./grayStar.png")
-            self.Game.colorCircle = QPixmap("./grayCircle.png")
-            self.Game.colorTriangle = QPixmap("./grayTriangle.png")
-            self.Game.colorSquare = QPixmap("./graySquare.png")
+            self.Game.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayStar.png")
+            self.Game.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayCircle.png")
+            self.Game.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayTriangle.png")
+            self.Game.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/graySquare.png")
 
             # update the images
             self.Game.colorStar2 = self.Game.colorStar.scaled(150,150)
