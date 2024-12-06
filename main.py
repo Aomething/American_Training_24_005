@@ -20,7 +20,9 @@ triangleSlot = None
 squareSlot = None
 
 # current shape and color being prompted
-promptObject = None
+promptObject = 0
+promptColor = 0
+promptShape = 0
 
 # general settings
 shapeNumber = None
@@ -28,26 +30,33 @@ colorNumber = None
 timePerRound = None
 totalPrompts = None
 
+currentRound = 1
+currentTimer = 0
+useTimer = True
+
+programRunning = False
+
+
 # shape IDs
-redStar = None
-redCircle = None
-redTriangle = None
-redSquare = None
+redStar = 16
+redCircle = 1
+redTriangle = 2
+redSquare = 3
 
-yellowStar = None
-yellowCircle = None
-yellowTriangle = None
-yellowSquare = None
+yellowStar = 4
+yellowCircle = 5
+yellowTriangle = 6
+yellowSquare = 7
 
-greenStar = None
-greenCircle = None
-greenTriangle = None
-greenSquare = None
+greenStar = 8
+greenCircle = 9
+greenTriangle = 10
+greenSquare = 11
 
-blueStar = None
-blueCircle = None
-blueTriangle = None
-blueSquare = None
+blueStar = 12
+blueCircle = 13
+blueTriangle = 14
+blueSquare = 15
 
 redList = redStar, redCircle, redTriangle, redSquare
 yellowList = yellowStar, yellowCircle, yellowTriangle, yellowSquare
@@ -86,16 +95,19 @@ class SettingsWidget(QWidget):
 
         # Settings Menu Start Button
         self.SettingsStartButton = QPushButton("Start Game")
-        self.SettingsStartButton.setFixedSize(100, 50)
-        self.SettingsStartButton.move(350,350)
+        self.SettingsStartButton.setFixedSize(150, 50)
+        self.SettingsStartButton.move(325,300)
         self.SettingsStartButton.show()
         self.SettingsStartButton.setParent(self)
+        self.testFont = self.SettingsStartButton.font()
+        self.testFont.setPointSize(15)
+        self.SettingsStartButton.setFont(self.testFont)
         
 
 
         # Settings Menu Slider 1 - number of shapes
         self.ShapeSlider = QSlider(parent=self) #initialize slider
-        self.ShapeSlider.setRange(1,4)  #set range of slider
+        self.ShapeSlider.setRange(2,4)  #set range of slider
         self.ShapeSlider.show() #enable disp
         self.ShapeSlider.move(100,100)   #move to appropriate spot in window
         self.ShapeSlider.resize(200,50) #change size
@@ -104,15 +116,21 @@ class SettingsWidget(QWidget):
         self.ShapeSlider.setOrientation(Qt.Orientation.Horizontal)  #set orientation
 
         # Settings Menu Slider Label 1 - number of shapes
-        self.ShapeLabel = QLabel("Number of Shapes: 1")
-        self.ShapeLabel.setFixedSize(150,25)
-        self.ShapeLabel.move(150,25)
+        self.ShapeLabel = QLabel("Number of Shapes: 2")
+        self.testFont = self.ShapeLabel.font()
+        self.testFont.setPointSize(15)
+        self.ShapeLabel.setFont(self.testFont)
+        self.ShapeLabel.setFixedSize(200,50)
+        self.ShapeLabel.move(108,25)
         self.ShapeLabel.show()
         self.ShapeLabel.setParent(self)
 
-        # Settings Menu Slider 1 - End Labels ('1' and '4')
-        self.ShapeLabelLeft = QLabel("1")
-        self.ShapeLabelLeft.setFixedSize(50,50)
+        # Settings Menu Slider 1 - End Labels ('2' and '4')
+        self.ShapeLabelLeft = QLabel("2")
+        self.ShapeLabelLeft.setFixedSize(100,50)
+        self.testFont = self.ShapeLabelLeft.font()
+        self.testFont.setPointSize(15)
+        self.ShapeLabelLeft.setFont(self.testFont)
         self.ShapeLabelLeft.move(75,70)
         self.ShapeLabelLeft.show()
         self.ShapeLabelLeft.setParent(self)
@@ -120,7 +138,10 @@ class SettingsWidget(QWidget):
         self.ShapeLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.ShapeLabelRight = QLabel("4")
-        self.ShapeLabelRight.setFixedSize(50,50)
+        self.ShapeLabelRight.setFixedSize(100,50)
+        self.testFont = self.ShapeLabelRight.font()
+        self.testFont.setPointSize(15)
+        self.ShapeLabelRight.setFont(self.testFont)
         self.ShapeLabelRight.move(310,70)
         self.ShapeLabelRight.show()
         self.ShapeLabelRight.setParent(self)
@@ -129,9 +150,9 @@ class SettingsWidget(QWidget):
 
 
 
-        # Settings Menu Slider 2 - number of colors 1 - 4 (increments of 1)
+        # Settings Menu Slider 2 - number of colors 2 - 4 (increments of 1)
         self.ColorSlider = QSlider(parent=self) #initialize slider
-        self.ColorSlider.setRange(1,4)  #set range of slider
+        self.ColorSlider.setRange(2,4)  #set range of slider
         self.ColorSlider.show() #enable disp
         self.ColorSlider.move(500,100)   #move to appropriate spot in window
         self.ColorSlider.resize(200,50) #change size
@@ -140,15 +161,21 @@ class SettingsWidget(QWidget):
         self.ColorSlider.setOrientation(Qt.Orientation.Horizontal)  #set orientation
 
         # Settings Menu Slider Label 2 - number of colors
-        self.ColorLabel = QLabel("Number of Colors: 1")
-        self.ColorLabel.setFixedSize(150,25)
-        self.ColorLabel.move(525, 25)
+        self.ColorLabel = QLabel("Number of Colors: 2")
+        self.ColorLabel.setFixedSize(200,50)
+        self.testFont = self.ColorLabel.font()
+        self.testFont.setPointSize(15)
+        self.ColorLabel.setFont(self.testFont)
+        self.ColorLabel.move(510, 25)
         self.ColorLabel.show()
         self.ColorLabel.setParent(self)
 
-        # Settings Menu Slider 2 - End Labels ('1' and '4')
-        self.ColorLabelLeft = QLabel("1")
+        # Settings Menu Slider 2 - End Labels ('2' and '4')
+        self.ColorLabelLeft = QLabel("2")
         self.ColorLabelLeft.setFixedSize(50,50)
+        self.testFont = self.ColorLabelLeft.font()
+        self.testFont.setPointSize(15)
+        self.ColorLabelLeft.setFont(self.testFont)
         self.ColorLabelLeft.move(475,70)
         self.ColorLabelLeft.show()
         self.ColorLabelLeft.setParent(self)
@@ -157,6 +184,9 @@ class SettingsWidget(QWidget):
 
         self.ColorLabelRight = QLabel("4")
         self.ColorLabelRight.setFixedSize(50,50)
+        self.testFont = self.ColorLabelRight.font()
+        self.testFont.setPointSize(15)
+        self.ColorLabelRight.setFont(self.testFont)
         self.ColorLabelRight.move(710,70)
         self.ColorLabelRight.show()
         self.ColorLabelRight.setParent(self)
@@ -167,38 +197,46 @@ class SettingsWidget(QWidget):
 
         # Settings Menu Slider 3 - time per prompt - 30s - 120s (increments of 15s) --> next tick after 120s is 'no limit'
         self.TimerSlider = QSlider(parent=self) #initialize slider
-        self.TimerSlider.setRange(30,120)  #set range of slider
+        self.TimerSlider.setRange(2,9)  #set range of slider
         self.TimerSlider.show() #enable disp
-        self.TimerSlider.move(100,325)   #move to appropriate spot in window
+        self.TimerSlider.move(100,255)   #move to appropriate spot in window
         self.TimerSlider.resize(200,50) #change size
-        self.TimerSlider.setTickInterval(9) #set amount of intervals
-        self.TimerSlider.setSliderPosition(30)   #set base position
-        self.TimerSlider.setSingleStep(15)
+        self.TimerSlider.setSliderPosition(2)   #set base position
         self.TimerSlider.setOrientation(Qt.Orientation.Horizontal)  #set orientation
 
         # Settings Menu Slider Label 3 - time per prompt
         self.TimerLabel = QLabel("Time Per Round: 30 sec")
-        self.TimerLabel.setFixedSize(150,25)
-        self.TimerLabel.move(150,250)
+        self.TimerLabel.setFixedSize(300, 50)
+        self.TimerLabel.move(90,180)
         self.TimerLabel.show()
         self.TimerLabel.setParent(self)
+        self.testFont = self.TimerLabel.font()
+        self.testFont.setPointSize(15)
+        self.TimerLabel.setFont(self.testFont)
+        
 
         # Settings Menu Slider 3 - End Labels ('1' and '4')
         self.TimerLabelLeft = QLabel("30 Sec")
-        self.TimerLabelLeft.setFixedSize(50,50)
-        self.TimerLabelLeft.move(75, 295)
+        self.TimerLabelLeft.setFixedSize(100,50)
+        self.TimerLabelLeft.move(30, 215)
         self.TimerLabelLeft.show()
         self.TimerLabelLeft.setParent(self)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.TimerLabelLeft.font()
+        self.testFont.setPointSize(15)
+        self.TimerLabelLeft.setFont(self.testFont)
 
         self.TimerLabelRight = QLabel("No Limit")
-        self.TimerLabelRight.setFixedSize(50,50)
-        self.TimerLabelRight.move(310,295)
+        self.TimerLabelRight.setFixedSize(100,50)
+        self.TimerLabelRight.move(310,215)
         self.TimerLabelRight.show()
         self.TimerLabelRight.setParent(self)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.TimerLabelRight.font()
+        self.testFont.setPointSize(15)
+        self.TimerLabelRight.setFont(self.testFont)
 
 
 
@@ -206,7 +244,7 @@ class SettingsWidget(QWidget):
         self.PromptSlider = QSlider(parent=self) #initialize slider
         self.PromptSlider.setRange(3,10)  #set range of slider
         self.PromptSlider.show() #enable disp
-        self.PromptSlider.move(500,325)   #move to appropriate spot in window
+        self.PromptSlider.move(500,255)   #move to appropriate spot in window
         self.PromptSlider.resize(200,50) #change size
         self.PromptSlider.setTickInterval(8) #set amount of intervals
         self.PromptSlider.setSliderPosition(1)   #set base position
@@ -214,27 +252,36 @@ class SettingsWidget(QWidget):
 
         # Settings Menu Slider Label 4 - number of prompts
         self.PromptLabel = QLabel("Number of Rounds: 3")
-        self.PromptLabel.setFixedSize(150,25)
-        self.PromptLabel.move(525, 250)
+        self.PromptLabel.setFixedSize(200, 50)
+        self.PromptLabel.move(500, 180)
         self.PromptLabel.show()
         self.PromptLabel.setParent(self)
+        self.testFont = self.PromptLabel.font()
+        self.testFont.setPointSize(15)
+        self.PromptLabel.setFont(self.testFont)
 
         # Settings Menu Slider 4 - End Labels ('3' and '10')
         self.PromptLabelLeft = QLabel("3")
         self.PromptLabelLeft.setFixedSize(50,50)
-        self.PromptLabelLeft.move(475, 295)
+        self.PromptLabelLeft.move(475, 215)
         self.PromptLabelLeft.show()
         self.PromptLabelLeft.setParent(self)
-        self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.PromptLabelLeft.font()
+        self.testFont.setPointSize(15)
+        self.PromptLabelLeft.setFont(self.testFont)
 
         self.PromptLabelRight = QLabel("10")
         self.PromptLabelRight.setFixedSize(50,50)
-        self.PromptLabelRight.move(710, 295)
+        self.PromptLabelRight.move(710, 215)
         self.PromptLabelRight.show()
         self.PromptLabelRight.setParent(self)
-        self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.ShapeLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.PromptLabelRight.font()
+        self.testFont.setPointSize(15)
+        self.PromptLabelRight.setFont(self.testFont)
             
         def updateShapeLabel():
             self.ShapeLabel.setText("Number of Shapes: " + str(self.ShapeSlider.value()))
@@ -243,10 +290,10 @@ class SettingsWidget(QWidget):
             self.ColorLabel.setText("Number of Shapes: " + str(self.ColorSlider.value()))
             
         def updateTimerLabel():
-            if (self.TimerSlider.value() < 120):
-                self.TimerLabel.setText("Timer per Round: " + str(self.TimerSlider.value()) + " sec")    
+            if (self.TimerSlider.value() < 9):
+                self.TimerLabel.setText("Time Per Round: " + str(self.TimerSlider.value()*15) + " sec")    
             else:
-                self.TimerLabel.setText("Timer per Round: No Limit")
+                self.TimerLabel.setText("Time Per Round: No Limit")
 
         def updatePromptLabel():
             self.PromptLabel.setText("Number of Rounds: " + str(self.PromptSlider.value()))
@@ -259,45 +306,100 @@ class SettingsWidget(QWidget):
 class GameWidget(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.roundChangeBuffer = QLineEdit()
+        self.roundChangeBuffer.setParent(self)
+        self.roundChangeBuffer.hide()
+
         self.starImage = QLabel(parent=self)
         self.circleImage = QLabel(parent=self)
         self.triangleImage = QLabel(parent=self)
         self.squareImage = QLabel(parent=self)
 
         self.debug_button = QPushButton("Next Prompt (Debug)")
+        self.debug_button.setFixedSize(150, 50)
+        self.debug_button.move(325, 200)
+        self.debug_button.setParent(self)
+        self.debug_button.show()
         
         self.colorStar = QPixmap("./grayStar.png")
-        self.colorStar2 = self.colorStar.scaled(100,100)
+        self.colorStar2 = self.colorStar.scaled(150,150)
         self.starImage.setPixmap(self.colorStar2)
         self.starImage.show()
         self.starImage.setFixedSize(150,150)
-        self.starImage.move(125,37.5)
+        self.starImage.move(125,37)
 
         self.colorCircle = QPixmap("./grayCircle.png")
-        self.colorCircle2 = self.colorCircle.scaled(100,100)
+        self.colorCircle2 = self.colorCircle.scaled(150,150)
         self.circleImage.setPixmap(self.colorCircle2)
         self.circleImage.show()
         self.circleImage.setFixedSize(150,150)
-        self.circleImage.move(525,37.5)
+        self.circleImage.move(525,37)
 
         self.colorTriangle = QPixmap("./grayTriangle.png")
-        self.colorTriangle2 = self.colorTriangle.scaled(100,100)
+        self.colorTriangle2 = self.colorTriangle.scaled(150,150)
         self.triangleImage.setPixmap(self.colorTriangle2)
         self.triangleImage.show()
         self.triangleImage.setFixedSize(150,150)
         self.triangleImage.move(125,225)
 
         self.colorSquare = QPixmap("./graySquare.png")
-        self.colorSquare2 = self.colorSquare.scaled(100,100)
+        self.colorSquare2 = self.colorSquare.scaled(150,150)
         self.squareImage.setPixmap(self.colorSquare2)
         self.squareImage.show()
         self.squareImage.setFixedSize(150,150)
         self.squareImage.move(525,225)
 
+        self.RoundsLabel = QLabel("Current Round: 1 / 10")
+        self.RoundsLabel.setFixedSize(150, 50)
+        self.RoundsLabel.move(325, 312)
+        self.RoundsLabel.setParent(self)
+        self.RoundsLabel.show()
+        self.RoundsLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.TimerLabel = QLabel(parent=self)
+        self.TimerLabel.setFixedSize(150, 50)
+        self.TimerLabel.move(325, 375)
+        self.TimerLabel.show()
+        self.TimerLabel.setText("Time Remaining: ")
+        self.TimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+        self.RoundTimer = QTimer(parent=self)
+        self.RoundTimer.setInterval(1000)        
+
+        def updateTimer():
+            #print("Timer event triggered!")
+            global programRunning
+            global currentTimer
+            global useTimer
+            global timePerRound
+
+            if (not programRunning):
+                programRunning = True
+                currentTimer = 0
+                newPrompt()
+
+            if useTimer and timePerRound < 121:
+                if currentTimer <= timePerRound:
+                    self.TimerLabel.setText("Time Remaining: " + str(timePerRound - currentTimer) + " sec")
+                else:
+                    newPrompt()
+                currentTimer += 1
+            else:
+                self.TimerLabel.setText("Time Remaining: No Limit")
+
+            print("Current Timer: " + str(currentTimer))
+            
+
+
         # generates a new random shape and color
         def newPrompt():
+
             global shapeListPool
             global colorListPool
+
+            global currentRound
 
             global redList
             global yellowList
@@ -309,29 +411,244 @@ class GameWidget(QWidget):
             global triangleList
             global squareList
 
-            randomColor = shapeListPool[random.randint(0,len(shapeListPool)-1)]
-            randomShape = colorListPool[random.randint(0,len(colorListPool)-1)]
+            global promptObject
+            global promptColor
+            global promptShape
 
-            print("-----------------")
-            if (randomColor == 0):
-                print("Color: Red")
-            elif (randomColor == 1):
-                print("Color: Yellow")
-            elif (randomColor == 2):
-                print("Color: Green")
-            elif (randomColor == 3):
-                print("Color: Blue")
+            global currentTimer
+            global useTimer
 
-            if (randomShape == 0):
-                print("Shape: Star")
-            elif (randomShape == 1):
-                print("Shape: Circle")
-            elif (randomShape == 2):
-                print("Shape: Triangle")
-            elif (randomShape == 3):
-                print("Shape: Square")
+            global timePerRound
+
+            lastPrompt = promptObject
+            lastColor = promptColor
+            lastShape = promptShape
+
+            currentTimer = 0
 
 
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#            self.roundChangeBuffer.setText("keepPlaying")
+
+#            if timePerRound > 120: 
+#                useTimer = False
+#            else:
+#                useTimer = True
+#
+#            self.RoundsLabel.setText("Current Round "+ str(currentRound + 1) + " / " + str(totalPrompts))
+#
+#            if useTimer:
+#                self.TimerLabel.setText("Time Remaining: " + str(timePerRound - currentTimer) + " sec")
+#            else:
+#                self.TimerLabel.setText("Time Remaining: No Limit")
+
+            # SHAPES:
+            # 0 = Star
+            # 1 = Circle
+            # 2 = Triangle
+            # 3 = Square
+
+            # COLORS:
+            # 0 = Red
+            # 1 = Yellow
+            # 2 = Green
+            # 3 = Blue
+
+            if (currentRound < totalPrompts):
+                #until you have a new unique item...
+
+                while(True):
+                    # randomize item
+                    randomShape = shapeListPool[random.randint(0,len(shapeListPool)-1)]
+                    randomColor = colorListPool[random.randint(0,len(colorListPool)-1)]
+                    
+                    # identify which item was chosen
+                    # RED SHAPES
+                    if (randomColor == 0 and randomShape == 0):
+                        #print("Prompt: Red Star")
+                        promptObject = redStar
+                        promptColor = 0
+                        promptShape = 0
+                        self.colorStar = QPixmap("./redStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 0 and randomShape == 1):
+                        #print("Prompt: Red Circle")
+                        promptObject = redCircle
+                        promptColor = 0
+                        promptShape = 1
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./redCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 0 and randomShape == 2):
+                        #print("Prompt: Red Triangle")
+                        promptObject = redTriangle
+                        promptColor = 0
+                        promptShape = 2
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./redTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 0 and randomShape == 3):
+                        #print("Prompt: Red Square")
+                        promptObject = redSquare
+                        promptColor = 0
+                        promptShape = 3
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./redSquare.png")
+
+                    # YELLOW SHAPES
+                    elif (randomColor == 1 and randomShape == 0):
+                        #print("Prompt: Yellow Star")
+                        promptObject = yellowStar
+                        promptColor = 1
+                        promptShape = 0
+                        self.colorStar = QPixmap("./yellowStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 1 and randomShape == 1):
+                        #print("Prompt: Yellow Circle")
+                        promptObject = yellowCircle
+                        promptColor = 1
+                        promptShape = 1
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./yellowCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 1 and randomShape == 2):
+                        #print("Prompt: Yellow Triangle")
+                        promptObject = yellowTriangle
+                        promptColor = 1
+                        promptShape = 2
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./yellowTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 1 and randomShape == 3):
+                        #print("Prompt: Yellow Square")
+                        promptObject = yellowSquare
+                        promptColor = 1
+                        promptShape = 3
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./yellowSquare.png")
+
+                    # GREEN SHAPES
+                    elif (randomColor == 2 and randomShape == 0):
+                        #print("Prompt: Green Star")
+                        promptObject = greenStar
+                        promptColor = 2
+                        promptShape = 0
+                        self.colorStar = QPixmap("./greenStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 2 and randomShape == 1):
+                        #print("Prompt: Green Circle")
+                        promptObject = greenCircle
+                        promptColor = 2
+                        promptShape = 1
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./greenCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 2 and randomShape == 2):
+                        #print("Prompt: Green Triangle")
+                        promptObject = greenTriangle
+                        promptColor = 2
+                        promptShape = 2
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./greenTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 2 and randomShape == 3):
+                        #print("Prompt: Green Square")
+                        promptObject = greenSquare
+                        promptColor = 2
+                        promptShape = 3
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./greenSquare.png")
+
+                    # BLUE SHAPES
+                    elif (randomColor == 3 and randomShape == 0):
+                        #print("Prompt: Blue Star")
+                        promptObject = blueStar
+                        promptColor = 3
+                        promptShape = 0
+                        self.colorStar = QPixmap("./blueStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 3 and randomShape == 1):
+                        #print("Prompt: Blue Circle")
+                        promptObject = blueCircle
+                        promptColor = 3
+                        promptShape = 1
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./blueCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 3 and randomShape == 2):
+                        #print("Prompt: Blue Triangle")
+                        promptObject = blueTriangle
+                        promptColor = 3
+                        promptShape = 2
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./blueTriangle.png")
+                        self.colorSquare = QPixmap("./graySquare.png")
+                    elif (randomColor == 3 and randomShape == 3):
+                        #print("Prompt: Blue Square")
+                        promptObject = blueSquare
+                        promptColor = 3
+                        promptShape = 3
+                        self.colorStar = QPixmap("./grayStar.png")
+                        self.colorCircle = QPixmap("./grayCircle.png")
+                        self.colorTriangle = QPixmap("./grayTriangle.png")
+                        self.colorSquare = QPixmap("./blueSquare.png")
+
+                    # update the images
+                    self.colorStar2 = self.colorStar.scaled(150,150)
+                    self.starImage.setPixmap(self.colorStar2)
+                    self.colorCircle2 = self.colorCircle.scaled(150,150)
+                    self.circleImage.setPixmap(self.colorCircle2)
+                    self.colorTriangle2 = self.colorTriangle.scaled(150,150)
+                    self.triangleImage.setPixmap(self.colorTriangle2)
+                    self.colorSquare2 = self.colorSquare.scaled(150,150)
+                    self.squareImage.setPixmap(self.colorSquare2)
+
+                    # debugging print statements
+
+                    #print("promptObject: ", promptObject)
+                    #print("lastPrompt: ", lastPrompt)
+                    #print("lastColor: ", lastColor)
+                    #print("lastShape: ", lastShape)
+
+                    if (lastPrompt != promptObject):
+                        break
+                    if (lastColor != promptColor):
+                        break
+                    if (lastShape != promptShape):
+                        break
+
+                currentRound += 1
+                self.roundChangeBuffer.setText("keepPlaying")
+                self.RoundsLabel.setText("Current Round "+ str(currentRound) + " / " + str(totalPrompts))
+            else:
+                self.roundChangeBuffer.setText("stopPlaying")
+        
+                
+
+
+            
         def read_RFID_daemon():
             print("test")
 
@@ -365,10 +682,13 @@ class GameWidget(QWidget):
             global greenSquare
         
         self.debug_button.clicked.connect(newPrompt)
+        self.RoundTimer.timeout.connect(updateTimer)
+        
 
     
 
 class WindowSystem(QMainWindow):
+
     def __init__(self):
         super().__init__()
 
@@ -383,11 +703,19 @@ class WindowSystem(QMainWindow):
         self.Game.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
         self.Game.hide() 
 
+        def EndGame():
+            global currentRound
+            global totalPrompts
+            if (currentRound >= totalPrompts and self.Game.roundChangeBuffer.text() == "stopPlaying"):
+                self.Game.hide()
+                self.Settings.show()
+                resetGame()
+
         def StartGame():
 
             # hide settings menu, show game menu, grab appropriate globals and constants to set up the game with
-            print("--Test 1--")
-            programRunning = True
+            global programRunning
+
             self.Game.show()
             self.Settings.hide()
 
@@ -397,47 +725,133 @@ class WindowSystem(QMainWindow):
             global shapeListPool
             global colorListPool
 
-            tempColorList = colorListConst
-            tempShapeList = shapeListConst
+            global currentRound
+            global currentTimer
 
             global shapeNumber
             global colorNumber
             global timePerRound
             global totalPrompts
 
+            colorListPool = [0]
+            shapeListPool = [0]
+
+            tempColorList = colorListConst
+            tempShapeList = shapeListConst
+
             colorNumber = self.Settings.ColorSlider.value()
             shapeNumber = self.Settings.ShapeSlider.value()
             totalPrompts = self.Settings.PromptSlider.value()
-            timePerRound = self.Settings.TimerSlider.value()
+            timePerRound = self.Settings.TimerSlider.value() * 15
 
-            tempColor = random.randint(0,3)
-            tempShape = random.randint(0,3)
+            tempColor = -1
+            tempShape = -1
 
+            # debug print statements
             print("Number of Colors: ", colorNumber)
             print("Numnber of Shapes: ", shapeNumber)
             print("Time Per Round: ", timePerRound)
             print("Number of Rounds: ", totalPrompts)
 
+            # copy a temp list of colors
+            # randomly grab an item from that list, add it to the pool (used in newPrompt())
+            # remove item from temp list to prevent picking the same item twice
+            # do this N times, where N = colorNumber
+            # repeat for shapes
+
+            for i in range(colorNumber):
+                #print("color number: \t", i)
+                tempColor = tempColorList[random.randint(0, len(tempColorList)-1)]
+                if (i == 0):
+                    colorListPool[0] = tempColor
+                else:
+                    colorListPool.append(tempColor)
+                #print("tempColor: \t",tempColor)
+                tempColorList.remove(tempColor)
+
+            for i in range(shapeNumber):
+                #print("shape number: \t", i)
+                tempShape = tempShapeList[random.randint(0, len(tempShapeList)-1)]
+                if (i == 0):
+                    shapeListPool[0] = tempShape
+                else:
+                    shapeListPool.append(tempShape)
+                #print("tempColor: \t",tempShape)
+                tempShapeList.remove(tempShape)
+
+            colorListConst = [0,1,2,3]
+            shapeListConst = [0,1,2,3]
+
+            currentRound = 0
+
+            if (not programRunning):
+                currentTimer = timePerRound - 2
+
+            programRunning = False
+
+            self.Game.RoundTimer.start()
+
+            self.Game.roundChangeBuffer.setText("keepPlaying")
+
+            if timePerRound > 120: 
+                useTimer = False
+            else:
+                useTimer = True
+
+            self.Game.RoundsLabel.setText("Current Round "+ str(currentRound + 1) + " / " + str(totalPrompts))
+
+            if useTimer:
+                self.Game.TimerLabel.setText("Time Remaining: " + str(timePerRound - currentTimer) + " sec")
+            else:
+                self.Game.TimerLabel.setText("Time Remaining: No Limit")
             
 
-            #print("\nColors Options:")
-            #for i in colorListPool:
-            #    print(colorListPool[i])
+        def resetGame():
 
-            #print("\nShape Options:")
-            #for i in shapeListPool:
-            #    print(shapeListPool[i])
+            global shapeListConst
+            global colorListConst
 
+            global shapeListPool
+            global colorListPool
 
+            colorListPool = [0]
+            shapeListPool = [0]
 
-        def EndGame():
-            print("--Test 2--")
-            programRunning = False
-            self.Game.hide()
-            self.Settings.show()
+            global currentRound
+            global currentTimer
+
+            global shapeNumber
+            global colorNumber
+            global timePerRound
+            global totalPrompts
+
+            colorListConst = [0,1,2,3]
+            shapeListConst = [0,1,2,3]
+            currentRound = 0
+            currentTimer = 0
+
+            self.Game.colorStar = QPixmap("./grayStar.png")
+            self.Game.colorCircle = QPixmap("./grayCircle.png")
+            self.Game.colorTriangle = QPixmap("./grayTriangle.png")
+            self.Game.colorSquare = QPixmap("./graySquare.png")
+
+            # update the images
+            self.Game.colorStar2 = self.Game.colorStar.scaled(150,150)
+            self.Game.starImage.setPixmap(self.Game.colorStar2)
+            self.Game.colorCircle2 = self.Game.colorCircle.scaled(150,150)
+            self.Game.circleImage.setPixmap(self.Game.colorCircle2)
+            self.Game.colorTriangle2 = self.Game.colorTriangle.scaled(150,150)
+            self.Game.triangleImage.setPixmap(self.Game.colorTriangle2)
+            self.Game.colorSquare2 = self.Game.colorSquare.scaled(150,150)
+            self.Game.squareImage.setPixmap(self.Game.colorSquare2)
+            
 
         self.Settings.SettingsStartButton.clicked.connect(StartGame)
-        #self.Game.button1.clicked.connect(EndGame)
+        self.Game.roundChangeBuffer.textChanged.connect(EndGame)
+        
+
+       
+
 
         
 
