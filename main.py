@@ -6,6 +6,21 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 
+# GPIO and RFID Setup
+import RPi.GPIO as GPIO
+import threading
+
+GPIO.setwarnings(False)
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(27, GPIO.OUT)
+GPIO.setup(22, GPIO.OUT)
+
+from mfrc522 import BasicMFRC522
+
+reader = BasicMFRC522()
+
 
 # window size
 WINDOW_WIDTH = 800
@@ -74,6 +89,8 @@ colorListConst = [0,1,2,3]
 shapeListPool = [0]
 colorListPool = [0]
 
+RFID_SCANNING = False
+
 # SHAPES:
 # 0 = Star
 # 1 = Circle
@@ -89,7 +106,7 @@ colorListPool = [0]
 
 class SettingsWidget(QWidget):
     def __init__(self):
-        super().__init__() 
+        super().__init__()
 
         programRunning = True
 
@@ -102,7 +119,7 @@ class SettingsWidget(QWidget):
         self.testFont = self.SettingsStartButton.font()
         self.testFont.setPointSize(15)
         self.SettingsStartButton.setFont(self.testFont)
-        
+
 
 
         # Settings Menu Slider 1 - number of shapes
@@ -282,13 +299,13 @@ class SettingsWidget(QWidget):
         self.testFont = self.PromptLabelRight.font()
         self.testFont.setPointSize(15)
         self.PromptLabelRight.setFont(self.testFont)
-            
+
         def updateShapeLabel():
             self.ShapeLabel.setText("Number of Shapes: " + str(self.ShapeSlider.value()))
 
         def updateColorLabel():
             self.ColorLabel.setText("Number of Shapes: " + str(self.ColorSlider.value()))
-            
+
         def updateTimerLabel():
             if (self.TimerSlider.value() < 9):
                 self.TimerLabel.setText("Time Per Round: " + str(self.TimerSlider.value()*15) + " sec")    
@@ -321,7 +338,7 @@ class GameWidget(QWidget):
         self.debug_button.move(325, 200)
         self.debug_button.setParent(self)
         self.debug_button.show()
-        
+
         self.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
         self.colorStar2 = self.colorStar.scaled(150,150)
         self.starImage.setPixmap(self.colorStar2)
@@ -364,22 +381,25 @@ class GameWidget(QWidget):
         self.TimerLabel.setText("Time Remaining: ")
         self.TimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-
+        # 1sec interrupt for updating timer
         self.RoundTimer = QTimer(parent=self)
         self.RoundTimer.setInterval(1000)
-
+        
+        
+        
         def updateTimer():
             #print("Timer event triggered!")
             global programRunning
             global currentTimer
             global useTimer
             global timePerRound
+            global RFID_SCANNING
 
-            if (not programRunning):
+            if (not programRunning and useTimer):
                 programRunning = True
                 currentTimer = 0
                 newPrompt()
-
+            
             if useTimer and timePerRound < 121:
                 if currentTimer <= timePerRound:
                     self.TimerLabel.setText("Time Remaining: " + str(timePerRound - currentTimer) + " sec")
@@ -388,9 +408,14 @@ class GameWidget(QWidget):
                 currentTimer += 1
             else:
                 self.TimerLabel.setText("Time Remaining: No Limit")
-
-            print("Current Timer: " + str(currentTimer))
             
+            rfid_thread_thread = threading.Thread(target=pulseScan,daemon=True)
+            
+            if not RFID_SCANNING:
+                rfid_thread_thread.start()
+                RFID_SCANNING = True
+            print("Current Timer: " + str(currentTimer))
+
 
 
         # generates a new random shape and color
@@ -426,22 +451,6 @@ class GameWidget(QWidget):
 
             currentTimer = 0
 
-
-            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#            self.roundChangeBuffer.setText("keepPlaying")
-
-#            if timePerRound > 120: 
-#                useTimer = False
-#            else:
-#                useTimer = True
-#
-#            self.RoundsLabel.setText("Current Round "+ str(currentRound + 1) + " / " + str(totalPrompts))
-#
-#            if useTimer:
-#                self.TimerLabel.setText("Time Remaining: " + str(timePerRound - currentTimer) + " sec")
-#            else:
-#                self.TimerLabel.setText("Time Remaining: No Limit")
-
             # SHAPES:
             # 0 = Star
             # 1 = Circle
@@ -461,7 +470,7 @@ class GameWidget(QWidget):
                     # randomize item
                     randomShape = shapeListPool[random.randint(0,len(shapeListPool)-1)]
                     randomColor = colorListPool[random.randint(0,len(colorListPool)-1)]
-                    
+
                     # identify which item was chosen
                     # RED SHAPES
                     if (randomColor == 0 and randomShape == 0):
@@ -644,48 +653,142 @@ class GameWidget(QWidget):
                 self.RoundsLabel.setText("Current Round "+ str(currentRound) + " / " + str(totalPrompts))
             else:
                 self.roundChangeBuffer.setText("stopPlaying")
+
+        GPIO.setwarnings(False)
+
+        GPIO.setmode(GPIO.BCM)
+
+#        GPIO.setup(27, GPIO.OUT)
+#        GPIO.setup(22, GPIO.OUT)
+
+
+        def read_RFID_daemon(slot):
+                global reader
+                print("THIS IS A DAEMON")
         
+                global starSlot
+                global circleSlot
+                global triangleSlot
+                global squareSlot
+                starSlot = None
+                circleSlot = None
+                triangleSlot = None
+                squareSlot = None
+                try:
+                        print("READING NOW")
+                        id = reader.read_id_no_block()
+                        if id:
+                                print("ID: ", id)
+                                if (slot == 0):
+                                        starSlot = id
+                                        print("STAR SLOT")
+                                elif (slot == 1):
+                                        circleSlot = id
+                                        print("CIRCLE SLOT")
+                                elif (slot == 2):
+                                        triangleSlot = id
+                                        print("TRIANGLE SLOT")
+                                elif (slot == 3):
+                                        squareSlot = id
+                                        print("SQUARE SLOT")
+                                else:
+                                        print("Error: Invalid Slot Number")
+                        print("StarSlot: ", str(starSlot))
+                        print("CircleSlot: ", str(circleSlot))
+                        print("TriangleSlot: ", str(triangleSlot))
+                        print("SquareSlot: ", str(squareSlot))
+                except Exception as e:
+                        print("Error Scanning")
                 
 
-
-            
-        def read_RFID_daemon():
-            print("test")
-
-
-        def checkSlot(slot):
-            print("test")
-            # shape IDs
+        def pulseScan():
+                        
             global starSlot
             global circleSlot
             global triangleSlot
             global squareSlot
+            
+            global RFID_SCANNING
 
-            global redStar
-            global redCircle
-            global redTriangle
-            global redSquare
+            try:
+               
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setup(22, GPIO.OUT)
+                GPIO.setup(27, GPIO.OUT)
+                
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.LOW)
+                
+                # Scanner 0
+                print("\nStarting Scan...")
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.LOW)
+                time.sleep(0.5)
+                rfid_thread0 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[0])
+                rfid_thread0.start()
+                rfid_thread0.join(timeout=2)
+                print("Thread Returned...")
+                time.sleep(2)
 
-            global yellowStar
-            global yellowCircle
-            global yellowTriangle
-            global yellowSquare
+                # Scanner 1
+                print("\nStarting Scan...")
+                GPIO.output(22, GPIO.HIGH)
+                GPIO.output(27, GPIO.LOW)
+                time.sleep(0.5)
+                rfid_thread1 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[1])
+                rfid_thread1.start()
+                rfid_thread1.join(timeout=2)
+                print("Thread Returned...\n")
+                time.sleep(2)
+                
+                # Scanner 2
+                print("Starting Scan...")
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.HIGH)
+                time.sleep(0.5)
+                rfid_thread2 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[2])
+                rfid_thread2.start()
+                rfid_thread2.join(timeout=2)
+                print("Thread Returned...\n")
+                time.sleep(2)
+                
+                # Scanner 3
+                print("Starting Scan...")
+                GPIO.output(22, GPIO.HIGH)
+                GPIO.output(27, GPIO.HIGH)
+                time.sleep(0.5)
+                rfid_thread3 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[3])
+                rfid_thread3.start()
+                rfid_thread3.join(timeout=2)
+                print("Thread Returned...\n")
+                time.sleep(2)
+                
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.LOW)
+                
+            finally:
+                GPIO.cleanup()
+                RFID_SCANNING = False
 
-            global blueStar
-            global blueCircle
-            global blueTriangle
-            global blueSquare
+        self.RFID_debug = QPushButton("Test RFID")
+        self.RFID_debug.setParent(self)
+        self.RFID_debug.setFixedSize(150, 50)
+        self.RFID_debug.show()
+        self.RFID_debug.move(0,0)
 
-            global greenStar
-            global greenCircle
-            global greenTriangle
-            global greenSquare
+
+        def checkSlot(slot):
+          	print("test")
         
+        #self.RFID_Timer = QTimer()
+        #self.RFID_Timer.setInterval(10000)
+        #self.RFID_Timer.timeout.connect(pulseScan)
+
+
         self.debug_button.clicked.connect(newPrompt)
         self.RoundTimer.timeout.connect(updateTimer)
-        
+        self.RFID_debug.clicked.connect(pulseScan)
 
-    
 
 class WindowSystem(QMainWindow):
 
@@ -790,6 +893,7 @@ class WindowSystem(QMainWindow):
             programRunning = False
 
             self.Game.RoundTimer.start()
+            #self.Game.RFID_Timer.start()
 
             self.Game.roundChangeBuffer.setText("keepPlaying")
 
@@ -808,6 +912,7 @@ class WindowSystem(QMainWindow):
 
         def resetGame():
 
+            self.Game.RoundTimer.stop()
             global shapeListConst
             global colorListConst
 
@@ -824,16 +929,19 @@ class WindowSystem(QMainWindow):
             global colorNumber
             global timePerRound
             global totalPrompts
+            
+            global programRunning
+            global useTimer
 
             colorListConst = [0,1,2,3]
             shapeListConst = [0,1,2,3]
             currentRound = 0
             currentTimer = 0
 
-            self.Game.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayStar.png")
-            self.Game.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayCircle.png")
-            self.Game.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/grayTriangle.png")
-            self.Game.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/graySquare.png")
+            self.Game.colorStar = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
+            self.Game.colorCircle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayCircle.png")
+            self.Game.colorTriangle = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayTriangle.png")
+            self.Game.colorSquare = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GraySquare.png")
 
             # update the images
             self.Game.colorStar2 = self.Game.colorStar.scaled(150,150)
@@ -844,6 +952,9 @@ class WindowSystem(QMainWindow):
             self.Game.triangleImage.setPixmap(self.Game.colorTriangle2)
             self.Game.colorSquare2 = self.Game.colorSquare.scaled(150,150)
             self.Game.squareImage.setPixmap(self.Game.colorSquare2)
+            
+            programRunning = False
+            useTimer = False
             
 
         self.Settings.SettingsStartButton.clicked.connect(StartGame)
