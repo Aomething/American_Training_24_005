@@ -153,8 +153,6 @@ class SettingsWidget(QWidget):
         # Settings Menu Slider 1 - End Labels ('2' and '4')
         self.ShapeLabelLeft = QLabel("2")
         self.ShapeLabelLeft.setFixedSize(100,50)
-        self.testFont = self.ShapeLabelLeft.font()
-        self.testFont.setPointSize(15)
         self.ShapeLabelLeft.setFont(self.testFont)
         self.ShapeLabelLeft.move(75,70)
         self.ShapeLabelLeft.show()
@@ -164,8 +162,6 @@ class SettingsWidget(QWidget):
 
         self.ShapeLabelRight = QLabel("4")
         self.ShapeLabelRight.setFixedSize(100,50)
-        self.testFont = self.ShapeLabelRight.font()
-        self.testFont.setPointSize(15)
         self.ShapeLabelRight.setFont(self.testFont)
         self.ShapeLabelRight.move(310,70)
         self.ShapeLabelRight.show()
@@ -235,8 +231,6 @@ class SettingsWidget(QWidget):
         self.TimerLabel.move(90,180)
         self.TimerLabel.show()
         self.TimerLabel.setParent(self)
-        self.testFont = self.TimerLabel.font()
-        self.testFont.setPointSize(15)
         self.TimerLabel.setFont(self.testFont)
 
 
@@ -248,8 +242,6 @@ class SettingsWidget(QWidget):
         self.TimerLabelLeft.setParent(self)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.testFont = self.TimerLabelLeft.font()
-        self.testFont.setPointSize(15)
         self.TimerLabelLeft.setFont(self.testFont)
 
         self.TimerLabelRight = QLabel("No Limit")
@@ -259,8 +251,6 @@ class SettingsWidget(QWidget):
         self.TimerLabelRight.setParent(self)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.testFont = self.TimerLabelRight.font()
-        self.testFont.setPointSize(15)
         self.TimerLabelRight.setFont(self.testFont)
 
 
@@ -281,8 +271,6 @@ class SettingsWidget(QWidget):
         self.PromptLabel.move(500, 180)
         self.PromptLabel.show()
         self.PromptLabel.setParent(self)
-        self.testFont = self.PromptLabel.font()
-        self.testFont.setPointSize(15)
         self.PromptLabel.setFont(self.testFont)
 
         # Settings Menu Slider 4 - End Labels ('3' and '10')
@@ -293,8 +281,6 @@ class SettingsWidget(QWidget):
         self.PromptLabelLeft.setParent(self)
         self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.testFont = self.PromptLabelLeft.font()
-        self.testFont.setPointSize(15)
         self.PromptLabelLeft.setFont(self.testFont)
 
         self.PromptLabelRight = QLabel("10")
@@ -304,8 +290,6 @@ class SettingsWidget(QWidget):
         self.PromptLabelRight.setParent(self)
         self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.testFont = self.PromptLabelRight.font()
-        self.testFont.setPointSize(15)
         self.PromptLabelRight.setFont(self.testFont)
 
         def updateShapeLabel():
@@ -327,6 +311,31 @@ class SettingsWidget(QWidget):
         self.ColorSlider.valueChanged.connect(updateColorLabel)
         self.TimerSlider.valueChanged.connect(updateTimerLabel)
         self.PromptSlider.valueChanged.connect(updatePromptLabel)
+
+        self.VolumeUpButton = QPushButton(text="+", parent=self)
+        self.VolumeUpButton.setFixedSize(50,50)
+        self.VolumeDownButton = QPushButton(text="-", parent=self)
+        self.VolumeDownButton.setFixedSize(50,50)
+ 
+        self.testFont = self.VolumeUpButton.font()
+        self.testFont.setPointSize(15)
+        self.VolumeUpButton.setFont(self.testFont)
+
+        self.testFont = self.VolumeDownButton.font()
+        self.testFont.setPointSize(15)
+        self.VolumeDownButton.setFont(self.testFont)
+
+        self.VolumeUpButton.move(750, 0)
+        self.VolumeUpButton.show()
+
+        self.VolumeDownButton.move(750, 100)
+        self.VolumeDownButton.show()
+
+        self.VolumeImage = QLabel(parent=self)
+        self.VolumePixmap = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/VolumeSymbol.png")
+        self.VolumeImage.setPixmap(self.VolumePixmap)
+        self.VolumeImage.show()
+        self.VolumeImage.move(750, 50)
 
 class GameWidget(QWidget):
     def __init__(self):
@@ -422,9 +431,6 @@ class GameWidget(QWidget):
                     RFID_SCANNING = True
 
                 print("Current Timer: " + str(currentTimer))
-
-
-            
 
         # generates a new random shape and color
         def newPrompt():
@@ -896,7 +902,33 @@ class GameWidget(QWidget):
         self.RoundTimer.timeout.connect(updateTimer)
         self.RFID_debug.clicked.connect(pulseScan)
 
+        self.VolumeUpButton = QPushButton(text="+", parent=self)
+        self.VolumeUpButton.setFixedSize(50,50)
+        self.VolumeDownButton = QPushButton(text="-",parent=self)
+        self.VolumeDownButton.setFixedSize(50,50)
+ 
+        self.testFont = self.VolumeUpButton.font()
+        self.testFont.setPointSize(15)
+        self.VolumeUpButton.setFont(self.testFont)
+
+        self.testFont = self.VolumeDownButton.font()
+        self.testFont.setPointSize(15)
+        self.VolumeDownButton.setFont(self.testFont)
+
+        self.VolumeUpButton.move(750, 0)
+        self.VolumeUpButton.show()
+
+        self.VolumeDownButton.move(750, 100)
+        self.VolumeDownButton.show()
+
+        self.VolumeImage = QLabel(parent=self)
+        self.VolumePixmap = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/VolumeSymbol.png")
+        self.VolumeImage.setPixmap(self.VolumePixmap)
+        self.VolumeImage.show()
+        self.VolumeImage.move(750, 50)
+
 class NotifWidget(QWidget):
+
     def __init__(self):
         super().__init__()
         self.leftImage = QLabel(parent=self)
@@ -930,9 +962,6 @@ class NotifWidget(QWidget):
         self.shapeText.move(450, 325)
         self.shapeText.hide()
 
-
-
-
 class WindowSystem(QMainWindow):
 
     def __init__(self):
@@ -943,7 +972,6 @@ class WindowSystem(QMainWindow):
         self.Settings = SettingsWidget()
         self.Settings.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
         self.Settings.show()
-        #self.Settings.hide()
         
         # Make an instance of the game menu
         self.Game = GameWidget()
@@ -954,7 +982,6 @@ class WindowSystem(QMainWindow):
         self.Notifications = NotifWidget()
         self.Notifications.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.Notifications.hide()
-        #self.Notifications.show()
 
         def EndGame():
             global currentRound
@@ -1138,13 +1165,24 @@ class WindowSystem(QMainWindow):
             
             global useTimer
 
-            tempTimerVar = False
+            programRunning = False
+
+            GPIO.setwarnings(False)
+            GPIO.setmode(GPIO.BCM)
+
+            GPIO.setup(25, GPIO.OUT) # MUX EN
+            GPIO.setup(4, GPIO.OUT) # MSB
+            GPIO.setup(5, GPIO.OUT) # LSB
+
+            GPIO.output(25, GPIO.HIGH)
+            GPIO.output(4, GPIO.LOW)
+            GPIO.output(5, GPIO.LOW)
 
             if self.Game.notifBuffer.text() != "0":
                 
-                programRunning = False
+        
                 
-                if self.Game.notifBuffer.text != "4":      
+                if self.Game.notifBuffer.text() != "4":      
                     if promptObject == redStar:
                         self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedStar.png")
                     elif promptObject == redCircle:
@@ -1236,25 +1274,79 @@ class WindowSystem(QMainWindow):
                 self.Game.hide()
                 self.Settings.hide()
 
-                ###
+                ############ AUDIO GPIO ############
+
+                if self.Game.notifBuffer.text() == "1":
+                    GPIO.output(4, GPIO.HIGH)
+                    GPIO.output(5, GPIO.LOW)
+                elif self.Game.notifBuffer.text() == "2":
+                    GPIO.output(4, GPIO.LOW)
+                    GPIO.output(5, GPIO.HIGH)
+                elif self.Game.notifBuffer.text() == "3":
+                    GPIO.output(4, GPIO.HIGH)
+                    GPIO.output(5, GPIO.HIGH)
+
+                GPIO.output(25, GPIO.LOW)
                 time.sleep(4)
+                GPIO.output(25, GPIO.HIGH)
+                
 
-                self.Notifications.shapeText.hide()
-                self.Notifications.colorText.hide()  
-                self.Notifications.leftImage.hide()
-                self.Notifications.rightImage.hide()  
-                self.Notifications.drawerImage.hide()    
-                self.Notifications.hide()
-                self.Game.show()
-                self.Settings.hide()
-                self.Game.notifBuffer.setText("0")
+                GPIO.output()
+                GPIO.output()
+                GPIO.output()
 
-                programRunning = True
-                useTimer = tempTimerVar
+                
+
+            GPIO.output(25, GPIO.LOW)
+            time.sleep(4)
+            GPIO.output(25, GPIO.HIGH)
+
+            self.Notifications.shapeText.hide()
+            self.Notifications.colorText.hide()  
+            self.Notifications.leftImage.hide()
+            self.Notifications.rightImage.hide()  
+            self.Notifications.drawerImage.hide()    
+            self.Notifications.hide()
+            self.Game.show()
+            self.Settings.hide()
+            self.Game.notifBuffer.setText("0")
+
+            programRunning = True
+
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+
+        def volumeUpDaemon():
+            volumeUpThread = threading.Thread(target=VolumeUP, daemon=True)
+            volumeUpThread.start()
+
+        def volumeDownDaemon():
+            volumeDownThread = threading.Thread(target=VolumeDOWN, daemon=True)
+            volumeDownThread.start()
+
+        def VolumeUP():
+            print("volume up")
+            GPIO.setup(25, GPIO.OUT)
+            GPIO.output(25, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.output(25, GPIO.LOW)
+
+        def VolumeDOWN():
+            print("volume down")
+            GPIO.setup(12, GPIO.OUT)
+            GPIO.output(12, GPIO.HIGH)
+            time.sleep(2)
+            GPIO.output(12, GPIO.LOW)
 
         self.Settings.SettingsStartButton.clicked.connect(StartGame)
         self.Game.roundChangeBuffer.textChanged.connect(EndGame)
         self.Game.notifBuffer.textChanged.connect(showNotif)
+
+        self.Game.VolumeUpButton.clicked.connect(volumeUpDaemon)
+        self.Settings.VolumeUpButton.clicked.connect(volumeUpDaemon)
+
+        self.Game.VolumeDownButton.clicked.connect(volumeDownDaemon)
+        self.Settings.VolumeDownButton.clicked.connect(volumeDownDaemon)
 
 
 if __name__ == "__main__":
