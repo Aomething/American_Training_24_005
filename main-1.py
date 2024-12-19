@@ -424,17 +424,10 @@ class GameWidget(QWidget):
                     self.TimerLabel.setText("Time Remaining: No Limit")
                 
                 
-                
+                fullScanThread = threading.Thread(target=full_scan, daemon=True)
                 if not RFID_SCANNING:
-                    try:
-                        RFID_SCANNING = True
-                        returnVal5 = func_timeout(9, full_scan)
-                            
-                    except FunctionTimedOut:
-                        print("FULL SCAN TERMINATED")
-                        RFID_SCANNING = False
-                    finally:
-                        RFID_SCANNING = False
+                    fullScanThread.start()
+                    RFID_SCANNING = True
 
                 print("Current Timer: " + str(currentTimer))
 
