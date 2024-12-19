@@ -6,6 +6,9 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 
+import func_timeout
+from func_timeout import func_timeout, FunctionTimedOut
+
 # GPIO and RFID Setup
 import RPi.GPIO as GPIO
 import threading
@@ -58,6 +61,8 @@ currentTimer = 0
 useTimer = True
 programRunning = False
 contentsChanged = False
+
+GameJustStarted = False
 
 # shape IDs
 redStar = 16
@@ -153,6 +158,8 @@ class SettingsWidget(QWidget):
         # Settings Menu Slider 1 - End Labels ('2' and '4')
         self.ShapeLabelLeft = QLabel("2")
         self.ShapeLabelLeft.setFixedSize(100,50)
+        self.testFont = self.ShapeLabelLeft.font()
+        self.testFont.setPointSize(15)
         self.ShapeLabelLeft.setFont(self.testFont)
         self.ShapeLabelLeft.move(75,70)
         self.ShapeLabelLeft.show()
@@ -162,6 +169,8 @@ class SettingsWidget(QWidget):
 
         self.ShapeLabelRight = QLabel("4")
         self.ShapeLabelRight.setFixedSize(100,50)
+        self.testFont = self.ShapeLabelRight.font()
+        self.testFont.setPointSize(15)
         self.ShapeLabelRight.setFont(self.testFont)
         self.ShapeLabelRight.move(310,70)
         self.ShapeLabelRight.show()
@@ -231,6 +240,8 @@ class SettingsWidget(QWidget):
         self.TimerLabel.move(90,180)
         self.TimerLabel.show()
         self.TimerLabel.setParent(self)
+        self.testFont = self.TimerLabel.font()
+        self.testFont.setPointSize(15)
         self.TimerLabel.setFont(self.testFont)
 
 
@@ -242,6 +253,8 @@ class SettingsWidget(QWidget):
         self.TimerLabelLeft.setParent(self)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.TimerLabelLeft.font()
+        self.testFont.setPointSize(15)
         self.TimerLabelLeft.setFont(self.testFont)
 
         self.TimerLabelRight = QLabel("No Limit")
@@ -251,6 +264,8 @@ class SettingsWidget(QWidget):
         self.TimerLabelRight.setParent(self)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.TimerLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.TimerLabelRight.font()
+        self.testFont.setPointSize(15)
         self.TimerLabelRight.setFont(self.testFont)
 
 
@@ -271,6 +286,8 @@ class SettingsWidget(QWidget):
         self.PromptLabel.move(500, 180)
         self.PromptLabel.show()
         self.PromptLabel.setParent(self)
+        self.testFont = self.PromptLabel.font()
+        self.testFont.setPointSize(15)
         self.PromptLabel.setFont(self.testFont)
 
         # Settings Menu Slider 4 - End Labels ('3' and '10')
@@ -281,6 +298,8 @@ class SettingsWidget(QWidget):
         self.PromptLabelLeft.setParent(self)
         self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.PromptLabelLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.PromptLabelLeft.font()
+        self.testFont.setPointSize(15)
         self.PromptLabelLeft.setFont(self.testFont)
 
         self.PromptLabelRight = QLabel("10")
@@ -290,6 +309,8 @@ class SettingsWidget(QWidget):
         self.PromptLabelRight.setParent(self)
         self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.PromptLabelRight.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.testFont = self.PromptLabelRight.font()
+        self.testFont.setPointSize(15)
         self.PromptLabelRight.setFont(self.testFont)
 
         def updateShapeLabel():
@@ -311,31 +332,6 @@ class SettingsWidget(QWidget):
         self.ColorSlider.valueChanged.connect(updateColorLabel)
         self.TimerSlider.valueChanged.connect(updateTimerLabel)
         self.PromptSlider.valueChanged.connect(updatePromptLabel)
-
-        self.VolumeUpButton = QPushButton(text="+", parent=self)
-        self.VolumeUpButton.setFixedSize(50,50)
-        self.VolumeDownButton = QPushButton(text="-", parent=self)
-        self.VolumeDownButton.setFixedSize(50,50)
- 
-        self.testFont = self.VolumeUpButton.font()
-        self.testFont.setPointSize(15)
-        self.VolumeUpButton.setFont(self.testFont)
-
-        self.testFont = self.VolumeDownButton.font()
-        self.testFont.setPointSize(15)
-        self.VolumeDownButton.setFont(self.testFont)
-
-        self.VolumeUpButton.move(750, 0)
-        self.VolumeUpButton.show()
-
-        self.VolumeDownButton.move(750, 100)
-        self.VolumeDownButton.show()
-
-        self.VolumeImage = QLabel(parent=self)
-        self.VolumePixmap = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/VolumeSymbol.png")
-        self.VolumeImage.setPixmap(self.VolumePixmap)
-        self.VolumeImage.show()
-        self.VolumeImage.move(750, 50)
 
 class GameWidget(QWidget):
     def __init__(self):
@@ -407,13 +403,16 @@ class GameWidget(QWidget):
 
         def updateTimer():
             #print("Timer event triggered!")
+            global GameJustStarted
             global programRunning
             global currentTimer
             global useTimer
             global timePerRound
             global RFID_SCANNING
             global contentsChanged
-
+            if (GameJustStarted):
+                newPrompt()
+                GameJustStarted = False
             if (programRunning):
                 if useTimer and timePerRound < 121:
                     if currentTimer <= timePerRound:
@@ -424,11 +423,18 @@ class GameWidget(QWidget):
                 else:
                     self.TimerLabel.setText("Time Remaining: No Limit")
                 
-                rfid_thread_thread = threading.Thread(target=pulseScan,daemon=True)
+                
                 
                 if not RFID_SCANNING:
-                    rfid_thread_thread.start()
-                    RFID_SCANNING = True
+                    try:
+                        RFID_SCANNING = True
+                        returnVal5 = func_timeout(9, full_scan)
+                            
+                    except FunctionTimedOut:
+                        print("FULL SCAN TERMINATED")
+                        RFID_SCANNING = False
+                    finally:
+                        RFID_SCANNING = False
 
                 print("Current Timer: " + str(currentTimer))
 
@@ -675,49 +681,89 @@ class GameWidget(QWidget):
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-
-        def read_RFID_daemon(slot):
-                global reader
-                print("THIS IS A DAEMON")
         
-                global starSlot
-                global circleSlot
-                global triangleSlot
-                global squareSlot
+        def scan_star():
+            global starSlot
+            id = 0
+            for i in range(0,10):
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.LOW)
+                print("Thread 1 running")
+                #try:
+                id = reader.read_id_no_block()
+                if id:
+                    print("STAR ID: ",id)
+                    starSlot = id
+                    return
+                #except Exception as e:
+                #	print("Error scanning")
+                #	return
+                #time.sleep(0.1)
+            starSlot = 0
+            return
 
-                #starSlot = None
-                #circleSlot = None
-                #triangleSlot = None
-                #squareSlot = None
-                try:
-                        print("READING NOW")
-                        id = reader.read_id_no_block()
-                        if id:
-                                print("ID: ", id)
-                                if (slot == 0):
-                                        starSlot = id
-                                        print("STAR SLOT")
-                                elif (slot == 1):
-                                        circleSlot = id
-                                        print("CIRCLE SLOT")
-                                elif (slot == 2):
-                                        triangleSlot = id
-                                        print("TRIANGLE SLOT")
-                                elif (slot == 3):
-                                        squareSlot = id
-                                        print("SQUARE SLOT")
-                                else:
-                                        print("Error: Invalid Slot Number")
-                        print("StarSlot: ", str(starSlot))
-                        print("CircleSlot: ", str(circleSlot))
-                        print("TriangleSlot: ", str(triangleSlot))
-                        print("SquareSlot: ", str(squareSlot))
-                except Exception as e:
-                        print("Error Scanning")
-                
+        def scan_circle():
+            global circleSlot
+            id = 0
+            for i in range(0,10):
+                GPIO.output(22, GPIO.LOW)
+                GPIO.output(27, GPIO.HIGH)
+                print("Thread 2 running")
+                #try:
+                id = reader.read_id_no_block()
+                if id:
+                    print("CIRCLE ID: ",id)
+                    circleSlot = id
+                    return
+                #except Exception as e:
+                #	print("Error scanning")
+                #	return
+                #time.sleep(0.1)
+            circleSlot = 0
+            return
 
-        def pulseScan():
-                        
+        def scan_triangle():
+            global triangleSlot
+            id = 0
+            for i in range(0,10):
+                GPIO.output(22, GPIO.HIGH)
+                GPIO.output(27, GPIO.LOW)
+                print("Thread 3 running")
+                #try:
+                id = reader.read_id_no_block()
+                if id:
+                    print("TRIANGLE ID: ",id)
+                    triangleSlot = id
+                    return
+                #except Exception as e:
+                #	print("Error scanning")
+                #	return
+                #time.sleep(0.1)
+            triangleSlot = 0
+            return
+
+        def scan_square():
+            global squareSlot
+            id = 0
+            for i in range(0,10):
+                GPIO.output(22, GPIO.HIGH)
+                GPIO.output(27, GPIO.HIGH)
+                print("Thread 4 running")
+                #try:
+                id = reader.read_id_no_block()
+                if id:
+                    print("SQUARE ID: ",id)
+                    squareSlot = id
+                    return
+                #except Exception as e:
+                #	print("Error scanning")
+                #	return
+                time.sleep(0.1)
+            squareSlot = 0
+            return
+
+        
+        def full_scan():
             global starSlot
             global circleSlot
             global triangleSlot
@@ -756,142 +802,126 @@ class GameWidget(QWidget):
 
             global correctShape
             global correctColor
+            
+            starSlotPrev = starSlot
+            circleSlotPrev = circleSlot
+            triangleSlotPrev = triangleSlot
+            squareSlotPrev = squareSlot
+            
+            #starSlot = 0
+            #circleSlot = 0
+            #triangleSlot = 0
+            #squareSlot = 0
+            
+            for i in range(0,4):
+                try:
+                    returnVal1 = func_timeout(0.75, scan_star)
+                except FunctionTimedOut:
+                    print("scan_star() could terminated\n")
+                
+                try:
+                    returnVal2 = func_timeout(0.75, scan_circle)
+                except FunctionTimedOut:
+                    print("scan_circle() terminated\n")
+                
+                try:
+                    returnVal3 = func_timeout(0.75, scan_triangle)
+                except FunctionTimedOut:
+                    print("scan_triangle() terminated\n")
+                
+                try:
+                    returnVal4 = func_timeout(0.75, scan_square)
+                except FunctionTimedOut:
+                    print("scan_square() terminated\n")
 
-            try:
-                starSlotPrev = starSlot
-                circleSlotPrev = circleSlot
-                triangleSlotPrev = triangleSlot
-                squareSlotPrev = squareSlot
+            if (starSlot == 0):
+                starSlotPrev = 0
+            if (circleSlot == 0):
+                circleSlotPrev = 0
+            if (triangleSlot == 0):
+                triangleSlotPrev = 0
+            if (squareSlot == 0):
+                squareSlotPrev = 0
 
-                GPIO.setmode(GPIO.BCM)
-                GPIO.setup(22, GPIO.OUT)
-                GPIO.setup(27, GPIO.OUT)
-                
-                GPIO.output(22, GPIO.LOW)
-                GPIO.output(27, GPIO.LOW)
-                
-                # Scanner 0
-                print("\nStarting Scan...")
-                GPIO.output(22, GPIO.LOW)
-                GPIO.output(27, GPIO.LOW)
-                time.sleep(0.5)
-                rfid_thread0 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[0])
-                rfid_thread0.start()
-                rfid_thread0.join(timeout=2)
-                print("Thread Returned...")
-                time.sleep(2)
+            print("SLOT CONTAINERS: ")
+            print("STAR: \t\t ", starSlot)
+            print("CIRCLE: \t ", circleSlot)
+            print("TRIANGLE: \t ", triangleSlot)
+            print("SQUARE: \t ", squareSlot)   
+            
+            if (starSlotPrev != starSlot):
+                contentsChanged = True
+                placedObject = starSlot
+            if (circleSlotPrev != circleSlot):
+                contentsChanged = True
+                placedObject = circleSlot
+            if (triangleSlotPrev != triangleSlot):
+                contentsChanged = True
+                placedObject = triangleSlot
+            if (squareSlotPrev != squareSlot):
+                contentsChanged = True
+                placedObject = squareSlot     
+        
+            
+            if placedObject == promptObject:
+                print("Correct!")
+                newPrompt()
+            else:
+                # else figure out what color it is, to set correct/incorrect color flag
+                if placedObject in redList:
+                    placedColor = 0
+                elif placedObject in yellowList:
+                    placedColor = 1
+                elif placedObject in greenList:
+                    placedColor = 2
+                elif placedObject in blueList:
+                    placedColor = 3
+                # same with shape
+                if placedObject in starList:
+                    placedShape = 0
+                elif placedObject in circleList:
+                    placedShape = 1
+                elif placedObject in triangleList:
+                    placedShape = 2
+                elif placedObject in squareList:
+                    placedShape = 3
 
-                # Scanner 1
-                print("\nStarting Scan...")
-                GPIO.output(22, GPIO.HIGH)
-                GPIO.output(27, GPIO.LOW)
-                time.sleep(0.5)
-                rfid_thread1 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[1])
-                rfid_thread1.start()
-                rfid_thread1.join(timeout=2)
-                print("Thread Returned...\n")
-                time.sleep(2)
-                
-                # Scanner 2
-                print("Starting Scan...")
-                GPIO.output(22, GPIO.LOW)
-                GPIO.output(27, GPIO.HIGH)
-                time.sleep(0.5)
-                rfid_thread2 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[2])
-                rfid_thread2.start()
-                rfid_thread2.join(timeout=2)
-                print("Thread Returned...\n")
-                time.sleep(2)
-                
-                # Scanner 3
-                print("Starting Scan...")
-                GPIO.output(22, GPIO.HIGH)
-                GPIO.output(27, GPIO.HIGH)
-                time.sleep(0.5)
-                rfid_thread3 = threading.Thread(target=read_RFID_daemon,daemon=True,args=[3])
-                rfid_thread3.start()
-                rfid_thread3.join(timeout=2)
-                print("Thread Returned...\n")
-                time.sleep(2)
-                
-                GPIO.output(22, GPIO.LOW)
-                GPIO.output(27, GPIO.LOW)
-                
-            finally:
-                GPIO.cleanup()
-                RFID_SCANNING = False
-                if (starSlotPrev != starSlot):
-                    contentsChanged = True
-                    placedObject = starSlot
-                if (circleSlotPrev != circleSlot):
-                    contentsChanged = True
-                    placedObject = circleSlot
-                if (triangleSlotPrev != triangleSlot):
-                    contentsChanged = True
-                    placedObject = triangleSlot
-                if (squareSlotPrev != squareSlot):
-                    contentsChanged = True
-                    placedObject = squareSlot
-
-                # if the object is a perfect match, go to next round
-                if placedObject == promptObject:
-                    print("Correct!")
-                    newPrompt()
+                # if color of object matches prompt
+                if placedColor == promptColor:
+                    correctColor = True
                 else:
-                    # else figure out what color it is, to set correct/incorrect color flag
-                    if placedObject in redList:
-                        placedColor = 0
-                    elif placedObject in yellowList:
-                        placedColor = 1
-                    elif placedObject in greenList:
-                        placedColor = 2
-                    elif placedObject in blueList:
-                        placedColor = 3
-                    # same with shape
-                    if placedObject in starList:
-                        placedShape = 0
-                    elif placedObject in circleList:
-                        placedShape = 1
-                    elif placedObject in triangleList:
-                        placedShape = 2
-                    elif placedObject in squareList:
-                        placedShape = 3
-
-                    # if color of object matches prompt
-                    if placedColor == promptColor:
-                        correctColor = True
-                    else:
-                        correctColor = False
-                    
-                    # if shape of object matches prompt
-                    if placedShape == promptShape:
-                        correctShape = True
-                    else:
-                        correctShape = False
+                    correctColor = False
                 
-                # errors
-                # 0 = no errors
-                # 1 = wrong shape
-                # 2 = wrong color
-                # 3 = wrong shape and color
-                # 4 = full drawer
-                    
-                # handle flags
-                if not correctShape and not correctColor: 
-                    self.notifBuffer.setText("3")
-                    currentTimer = 0
-                elif not correctShape and correctColor:
-                    self.notifBuffer.setText("1")
-                    currentTimer = 0
-                elif correctShape and not correctColor:
-                    self.notifBuffer.setText("2")
-                    currentTimer = 0
+                # if shape of object matches prompt
+                if placedShape == promptShape:
+                    correctShape = True
+                else:
+                    correctShape = False
+            
+            # errors
+            # 0 = no errors
+            # 1 = wrong shape
+            # 2 = wrong color
+            # 3 = wrong shape and color
+            # 4 = full drawer
+                
+            # handle flags
+            if not correctShape and not correctColor: 
+                self.notifBuffer.setText("3")
+                currentTimer = 0
+            elif not correctShape and correctColor:
+                self.notifBuffer.setText("1")
+                currentTimer = 0
+            elif correctShape and not correctColor:
+                self.notifBuffer.setText("2")
+                currentTimer = 0
 
 
-                print("correctColor: ", correctColor)
-                print("correctShape: ", correctShape)
-                contentsChanged = False
-
+            print("correctColor: ", correctColor)
+            print("correctShape: ", correctShape)
+            
+            RFID_SCANNING = False
+            
         self.RFID_debug = QPushButton("Test RFID")
         self.RFID_debug.setParent(self)
         self.RFID_debug.setFixedSize(150, 50)
@@ -900,35 +930,9 @@ class GameWidget(QWidget):
 
         self.debug_button.clicked.connect(newPrompt)
         self.RoundTimer.timeout.connect(updateTimer)
-        self.RFID_debug.clicked.connect(pulseScan)
-
-        self.VolumeUpButton = QPushButton(text="+", parent=self)
-        self.VolumeUpButton.setFixedSize(50,50)
-        self.VolumeDownButton = QPushButton(text="-",parent=self)
-        self.VolumeDownButton.setFixedSize(50,50)
- 
-        self.testFont = self.VolumeUpButton.font()
-        self.testFont.setPointSize(15)
-        self.VolumeUpButton.setFont(self.testFont)
-
-        self.testFont = self.VolumeDownButton.font()
-        self.testFont.setPointSize(15)
-        self.VolumeDownButton.setFont(self.testFont)
-
-        self.VolumeUpButton.move(750, 0)
-        self.VolumeUpButton.show()
-
-        self.VolumeDownButton.move(750, 100)
-        self.VolumeDownButton.show()
-
-        self.VolumeImage = QLabel(parent=self)
-        self.VolumePixmap = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/VolumeSymbol.png")
-        self.VolumeImage.setPixmap(self.VolumePixmap)
-        self.VolumeImage.show()
-        self.VolumeImage.move(750, 50)
+        self.RFID_debug.clicked.connect(full_scan)
 
 class NotifWidget(QWidget):
-
     def __init__(self):
         super().__init__()
         self.leftImage = QLabel(parent=self)
@@ -979,9 +983,10 @@ class WindowSystem(QMainWindow):
         self.Game.hide() 
 
         # Make an instance of the notif menu
-        self.Notifications = NotifWidget()
-        self.Notifications.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-        self.Notifications.hide()
+        #self.Notifications = NotifWidget()
+        #self.Notifications.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+        #self.Notifications.hide()
+        #self.Notifications.show()
 
         def EndGame():
             global currentRound
@@ -995,7 +1000,7 @@ class WindowSystem(QMainWindow):
 
             # hide settings menu, show game menu, grab appropriate globals and constants to set up the game with
             global programRunning
-
+            global GameJustStarted
             self.Game.show()
             self.Settings.hide()
 
@@ -1065,7 +1070,7 @@ class WindowSystem(QMainWindow):
             currentRound = 0
 
             if not programRunning:
-                currentTimer = timePerRound - 1
+                currentTimer = timePerRound
 
             programRunning = True
 
@@ -1086,7 +1091,7 @@ class WindowSystem(QMainWindow):
             else:
                 self.Game.TimerLabel.setText("Time Remaining: No Limit")
                 
-            self.Game.newPrompt()
+            GameJustStarted = True
 
         def resetGame():
 
@@ -1133,220 +1138,11 @@ class WindowSystem(QMainWindow):
             self.Game.triangleImage.setPixmap(self.Game.colorTriangle2)
             self.Game.colorSquare2 = self.Game.colorSquare.scaled(150,150)
             self.Game.squareImage.setPixmap(self.Game.colorSquare2)
-            
-        def showNotif():
-            global programRunning
 
-            global redStar
-            global redCircle
-            global redTriangle
-            global redSquare
-
-            global yellowStar
-            global yellowCircle
-            global yellowTriangle
-            global yellowSquare
-
-            global greenStar
-            global greenCircle
-            global greenTriangle
-            global greenSquare
-
-            global blueStar
-            global blueCircle
-            global blueTriangle
-            global blueSquare
-
-            global promptObject
-            global promptColor
-            global promptShape
-
-            global placedObject
-            
-            global useTimer
-
-            programRunning = False
-
-            GPIO.setwarnings(False)
-            GPIO.setmode(GPIO.BCM)
-
-            GPIO.setup(25, GPIO.OUT) # MUX EN
-            GPIO.setup(4, GPIO.OUT) # MSB
-            GPIO.setup(5, GPIO.OUT) # LSB
-
-            GPIO.output(25, GPIO.HIGH)
-            GPIO.output(4, GPIO.LOW)
-            GPIO.output(5, GPIO.LOW)
-
-            if self.Game.notifBuffer.text() != "0":
-                
-        
-                
-                if self.Game.notifBuffer.text() != "4":      
-                    if promptObject == redStar:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedStar.png")
-                    elif promptObject == redCircle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedCircle.png")
-                    elif promptObject == redTriangle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedTriangle.png")
-                    elif promptObject == redSquare:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedSquare.png")
-                    elif promptObject == yellowStar:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowStar.png")
-                    elif promptObject == yellowCircle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowCircle.png")
-                    elif promptObject == yellowTriangle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowTriangle.png")
-                    elif promptObject == yellowSquare:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowSquare.png")
-                    elif promptObject == greenStar:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenStar.png")
-                    elif promptObject == greenCircle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenCircle.png")
-                    elif promptObject == greenTriangle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenTriangle.png")
-                    elif promptObject == greenSquare:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenSquare.png")
-                    elif promptObject == blueStar:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueStar.png")
-                    elif promptObject == blueCircle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueCircle.png")
-                    elif promptObject == blueTriangle:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueTriangle.png")
-                    elif promptObject == blueSquare:
-                        self.Notifications.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueSquare.png")
-                    ################################################################################
-                    if placedObject == redStar:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedStar.png")
-                    elif placedObject == redCircle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedCircle.png")
-                    elif placedObject == redTriangle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedTriangle.png")
-                    elif placedObject == redSquare:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/RedSquare.png")
-                    elif placedObject == yellowStar:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowStar.png")
-                    elif placedObject == yellowCircle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowCircle.png")
-                    elif placedObject == yellowTriangle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowTriangle.png")
-                    elif placedObject == yellowSquare:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/YellowSquare.png")
-                    elif placedObject == greenStar:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenStar.png")
-                    elif placedObject == greenCircle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenCircle.png")
-                    elif placedObject == greenTriangle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenTriangle.png")
-                    elif placedObject == greenSquare:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GreenSquare.png")
-                    elif placedObject == blueStar:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueStar.png")
-                    elif placedObject == blueCircle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueCircle.png")
-                    elif placedObject == blueTriangle:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueTriangle.png")
-                    elif placedObject == blueSquare:
-                        self.Notifications.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/BlueSquare.png")
-
-                    self.Notifications.leftPix2 = self.Notifications.leftPix.scaled(150,150)
-                    self.Notifications.leftImage.setPixmap(self.Notifications.leftPix2)
-
-                    self.Notifications.rightPix2 = self.Notifications.rightPix.scaled(150,150)
-                    self.Notifications.rightImage.setPixmap(self.Notifications.rightPix2)
-
-                    if self.Game.notifBuffer.text() == "3":
-                        self.Notifications.colorText.show()
-                        self.Notifications.shapeText.show()
-                        self.Notifications.leftImage.show()
-                        self.Notifications.rightImage.show()
-                    elif self.Game.notifBuffer.text() == "2":
-                        self.Notifications.colorText.show()
-                        self.Notifications.leftImage.show()
-                        self.Notifications.rightImage.show()
-                    elif self.Game.notifBuffer.text() == "1":
-                        self.Notifications.shapeText.show()
-                        self.Notifications.leftImage.show()
-                        self.Notifications.rightImage.show()
-                else:
-                    self.Notifications.drawerImage.show()
-                self.Notifications.show()
-                self.Game.hide()
-                self.Settings.hide()
-
-                ############ AUDIO GPIO ############
-
-                if self.Game.notifBuffer.text() == "1":
-                    GPIO.output(4, GPIO.HIGH)
-                    GPIO.output(5, GPIO.LOW)
-                elif self.Game.notifBuffer.text() == "2":
-                    GPIO.output(4, GPIO.LOW)
-                    GPIO.output(5, GPIO.HIGH)
-                elif self.Game.notifBuffer.text() == "3":
-                    GPIO.output(4, GPIO.HIGH)
-                    GPIO.output(5, GPIO.HIGH)
-
-                GPIO.output(25, GPIO.LOW)
-                time.sleep(4)
-                GPIO.output(25, GPIO.HIGH)
-                
-
-                GPIO.output()
-                GPIO.output()
-                GPIO.output()
-
-                
-
-            GPIO.output(25, GPIO.LOW)
-            time.sleep(4)
-            GPIO.output(25, GPIO.HIGH)
-
-            self.Notifications.shapeText.hide()
-            self.Notifications.colorText.hide()  
-            self.Notifications.leftImage.hide()
-            self.Notifications.rightImage.hide()  
-            self.Notifications.drawerImage.hide()    
-            self.Notifications.hide()
-            self.Game.show()
-            self.Settings.hide()
-            self.Game.notifBuffer.setText("0")
-
-            programRunning = True
-
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)
-
-        def volumeUpDaemon():
-            volumeUpThread = threading.Thread(target=VolumeUP, daemon=True)
-            volumeUpThread.start()
-
-        def volumeDownDaemon():
-            volumeDownThread = threading.Thread(target=VolumeDOWN, daemon=True)
-            volumeDownThread.start()
-
-        def VolumeUP():
-            print("volume up")
-            GPIO.setup(25, GPIO.OUT)
-            GPIO.output(25, GPIO.HIGH)
-            time.sleep(1)
-            GPIO.output(25, GPIO.LOW)
-
-        def VolumeDOWN():
-            print("volume down")
-            GPIO.setup(12, GPIO.OUT)
-            GPIO.output(12, GPIO.HIGH)
-            time.sleep(2)
-            GPIO.output(12, GPIO.LOW)
 
         self.Settings.SettingsStartButton.clicked.connect(StartGame)
         self.Game.roundChangeBuffer.textChanged.connect(EndGame)
-        self.Game.notifBuffer.textChanged.connect(showNotif)
-
-        self.Game.VolumeUpButton.clicked.connect(volumeUpDaemon)
-        self.Settings.VolumeUpButton.clicked.connect(volumeUpDaemon)
-
-        self.Game.VolumeDownButton.clicked.connect(volumeDownDaemon)
-        self.Settings.VolumeDownButton.clicked.connect(volumeDownDaemon)
+        #self.Game.notifBuffer.textChanged.connect(showNotif)
 
 
 if __name__ == "__main__":
