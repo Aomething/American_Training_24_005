@@ -658,13 +658,13 @@ class GameWidget(QWidget):
                 self.roundChangeBuffer.setText("keepPlaying")
                 self.RoundsLabel.setText("Current Round "+ str(currentRound) + " / " + str(totalPrompts))
                 # if current prompt wants a star and the star already has something in it...
-                if promptObject in starList and starSlotPrev != 0:
+                if promptObject in starList and starSlot != 0 and starSlotPrev != 0:
                     self.notifBuffer.setText("4")
-                elif promptObject in circleList and circleSlotPrev != 0:
+                elif promptObject in circleList and circleSlot != 0 and circleSlotPrev != 0:
                     self.notifBuffer.setText("4")
-                elif promptObject in triangleList and triangleSlotPrev != 0:
+                elif promptObject in triangleList and triangleSlot != 0 and triangleSlotPrev != 0:
                     self.notifBuffer.setText("4")
-                elif promptObject in squareList and squareSlotPrev != 0:
+                elif promptObject in squareList and squareSlot != 0 and squareSlotPrev != 0:
                     self.notifBuffer.setText("4")
                 elif starSlotPrev != 0 and circleSlotPrev != 0 and triangleSlotPrev != 0 and squareSlotPrev != 0:
                     self.notifBuffer.setText("4")
@@ -801,12 +801,6 @@ class GameWidget(QWidget):
             triangleSlotPrev = triangleSlot
             squareSlotPrev = squareSlot
             
-            starSlotFull = False
-            circleSlotFull = False
-            triangleSlotFull = False
-            squareSlotFull = False
-            
-            
             starSlot = 0
             circleSlot = 0
             triangleSlot = 0
@@ -882,7 +876,8 @@ class GameWidget(QWidget):
         
             if contentsChanged:
                 if placedObject == promptObject:
-                    print("Correct!")
+                    self.notifBuffer.setText("5")
+                    currentTimer = 0
                     newPrompt()
                 else:
                     # else figure out what color it is, to set correct/incorrect color flag
@@ -927,11 +922,11 @@ class GameWidget(QWidget):
                 if not correctShape and not correctColor: 
                     self.notifBuffer.setText("3")
                     currentTimer = 0
-                elif not correctShape and correctColor:
-                    self.notifBuffer.setText("1")
-                    currentTimer = 0
                 elif correctShape and not correctColor:
                     self.notifBuffer.setText("2")
+                    currentTimer = 0
+                elif not correctShape and correctColor:
+                    self.notifBuffer.setText("1")
                     currentTimer = 0
 
 
@@ -939,7 +934,115 @@ class GameWidget(QWidget):
             print("correctShape: ", correctShape)
             
             RFID_SCANNING = False
+        
+        self.notifImage = QLabel(parent=self)
+        self.move(0,0)
+        self.hide()
+        self.incorrectPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/INCORRECT.jpg")
+        self.correctPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/CORRECT.jpg")
+        self.drawerPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/DRAWER.jpg")
+
+        self.wrongColor = QLabel("Wrong Color", parent=self)
+        self.wrongColor.setFixedSize(300, 100)
+        self.wrongColor.move(50, 325)
+        self.wrongColor.hide()
+
+        self.wrongShape = QLabel("Wrong Shape", parent=self)
+        self.wrongShape.setFixedSize(300, 100)
+        self.wrongShape.move(450, 325)
+        self.wrongShape.hide()
+
+        def feedback():
+            global programRunning
+            programRunning = False
+
+            GPIO.setwarnings(False)
+            GPIO.setmode(GPIO.BCM)
             
+            GPIO.setup(23, GPIO.OUT) # LSB
+            GPIO.setup(24, GPIO.OUT) # MSB
+            GPIO.setup(26, GPIO.OUT) # Enable
+
+            GPIO.output(23, GPIO.LOW)
+            GPIO.output(24, GPIO.LOW)
+            GPIO.output(26, GPIO.HIGH)
+
+            error = self.notifBuffer.text()
+            
+            # wrong shape
+            if error == "1":
+                self.notifImage.setPixmap(self.incorrectPix)
+                self.notifImage.show()
+                self.wrongShape.show()
+                GPIO.output(23, GPIO.LOW)
+                GPIO.output(24, GPIO.LOW)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                self.notifImage.hide()
+                self.wrongShape.hide()
+                self.wrongColor.hide()
+            # wrong color
+            elif error == "2":
+                self.notifImage.setPixmap(self.incorrectPix)
+                self.notifImage.show()
+                self.wrongColor.show()
+                GPIO.output(23, GPIO.HIGH)
+                GPIO.output(24, GPIO.LOW)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                self.notifImage.hide()
+                self.wrongShape.hide()
+                self.wrongColor.hide()
+            # wrong shape AND wrong color
+            elif error == "3":
+                self.notifImage.setPixmap(self.incorrectPix)
+                self.notifImage.show()
+                self.wrongShape.show()
+                self.wrongColor.show()
+                GPIO.output(23, GPIO.LOW)
+                GPIO.output(24, GPIO.LOW)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                
+                GPIO.output(23, GPIO.HIGH)
+                GPIO.output(24, GPIO.LOW)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                self.notifImage.hide()
+                self.wrongShape.hide()
+                self.wrongColor.hide()
+            # drawer (or slot being prompted) is full
+            elif error == "4":
+                self.notifImage.setPixmap(self.drawerPix)
+                self.notifImage.show()
+                GPIO.output(23, GPIO.LOW)
+                GPIO.output(24, GPIO.HIGH)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                self.notifImage.hide()
+                self.wrongShape.hide()
+                self.wrongColor.hide()
+            # correct
+            elif error == "5":
+                self.notifImage.setPixmap(self.correctPix)
+                self.notifImage.show()
+                GPIO.output(23, GPIO.HIGH)
+                GPIO.output(24, GPIO.HIGH)
+                time.sleep(3)
+                GPIO.output(26, GPIO.HIGH)
+                self.notifImage.hide()
+                self.wrongShape.hide()
+                self.wrongColor.hide()
+
+            else:
+                error = 0
+            
+            
+            # done
+            self.notifBuffer.setText("0")
+
+            programRunning = True
+
         self.RFID_debug = QPushButton("Test RFID")
         self.RFID_debug.setParent(self)
         self.RFID_debug.setFixedSize(150, 50)
@@ -949,40 +1052,7 @@ class GameWidget(QWidget):
         self.debug_button.clicked.connect(newPrompt)
         self.RoundTimer.timeout.connect(updateTimer)
         self.RFID_debug.clicked.connect(full_scan)
-
-class NotifWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.leftImage = QLabel(parent=self)
-        self.leftPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
-        self.leftPix2 = self.leftPix.scaled(150,150)
-        self.leftImage.setPixmap(self.leftPix2)
-        self.leftImage.move(125, 150)
-        self.leftImage.hide()
-
-        self.rightImage = QLabel(parent=self)
-        self.rightPix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/GrayStar.png")
-        self.rightPix2 = self.rightPix.scaled(150,150)
-        self.rightImage.setPixmap(self.rightPix2)
-        self.rightImage.move(525, 150)
-        self.rightImage.hide()
-
-        self.drawerImage = QLabel(parent=self)
-        self.drawerImagePix = QPixmap("/home/nickl/pi-rfid/American_Training_24_005/DrawerDisplay.png")
-        self.drawerImage.setPixmap(self.drawerImagePix)
-        self.drawerImage.move(0,0)
-        self.drawerImage.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
-        self.drawerImage.hide()
-
-        self.colorText = QLabel("Wrong Color", parent=self)
-        self.colorText.setFixedSize(300, 100)
-        self.colorText.move(50, 325)
-        self.colorText.hide()
-
-        self.shapeText = QLabel("Wrong Shape", parent=self)
-        self.shapeText.setFixedSize(300, 100)
-        self.shapeText.move(450, 325)
-        self.shapeText.hide()
+        self.notifBuffer.textChanged.connect(feedback)
 
 class WindowSystem(QMainWindow):
 
@@ -999,12 +1069,6 @@ class WindowSystem(QMainWindow):
         self.Game = GameWidget()
         self.Game.setFixedSize(WINDOW_WIDTH,WINDOW_HEIGHT)
         self.Game.hide() 
-
-        # Make an instance of the notif menu
-        #self.Notifications = NotifWidget()
-        #self.Notifications.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-        #self.Notifications.hide()
-        #self.Notifications.show()
 
         def EndGame():
             global currentRound
@@ -1161,8 +1225,6 @@ class WindowSystem(QMainWindow):
 
         self.Settings.SettingsStartButton.clicked.connect(StartGame)
         self.Game.roundChangeBuffer.textChanged.connect(EndGame)
-        #self.Game.notifBuffer.textChanged.connect(showNotif)
-
 
 if __name__ == "__main__":
 
