@@ -65,25 +65,25 @@ contentsChanged = False
 GameJustStarted = False
 
 # shape IDs
-redStar = 16
-redCircle = 1
-redTriangle = 2
-redSquare = 3
+redStar = 465307990724
+redCircle = 398517828204
+redTriangle = 673999452788
+redSquare = 328757902018
 
-yellowStar = 4
-yellowCircle = 5
-yellowTriangle = 6
-yellowSquare = 7
+yellowStar = 604726524600
+yellowCircle = 809257433645
+yellowTriangle = 398886730361
+yellowSquare = 396622002941
 
-greenStar = 8
-greenCircle = 9
-greenTriangle = 10
-greenSquare = 11
+greenStar = 1074135675430
+greenCircle = 181486989998
+greenTriangle = 798955778676
+greenSquare = 321727738471
 
-blueStar = 12
-blueCircle = 13
-blueTriangle = 14
-blueSquare = 15
+blueStar = 52974221985
+blueCircle = 253310251525
+blueTriangle = 328070167253
+blueSquare = 457824645689
 
 redList = redStar, redCircle, redTriangle, redSquare
 yellowList = yellowStar, yellowCircle, yellowTriangle, yellowSquare
@@ -681,7 +681,7 @@ class GameWidget(QWidget):
             for i in range(0,10):
                 GPIO.output(22, GPIO.LOW)
                 GPIO.output(27, GPIO.LOW)
-                print("Thread 1 running")
+                #print("Thread 1 running")
                 #try:
                 id = reader.read_id_no_block()
                 if id:
@@ -701,7 +701,7 @@ class GameWidget(QWidget):
             for i in range(0,10):
                 GPIO.output(22, GPIO.LOW)
                 GPIO.output(27, GPIO.HIGH)
-                print("Thread 2 running")
+                #print("Thread 2 running")
                 #try:
                 id = reader.read_id_no_block()
                 if id:
@@ -721,7 +721,7 @@ class GameWidget(QWidget):
             for i in range(0,10):
                 GPIO.output(22, GPIO.HIGH)
                 GPIO.output(27, GPIO.LOW)
-                print("Thread 3 running")
+                #print("Thread 3 running")
                 #try:
                 id = reader.read_id_no_block()
                 if id:
@@ -741,7 +741,7 @@ class GameWidget(QWidget):
             for i in range(0,10):
                 GPIO.output(22, GPIO.HIGH)
                 GPIO.output(27, GPIO.HIGH)
-                print("Thread 4 running")
+                #print("Thread 4 running")
                 #try:
                 id = reader.read_id_no_block()
                 if id:
@@ -801,31 +801,45 @@ class GameWidget(QWidget):
             triangleSlotPrev = triangleSlot
             squareSlotPrev = squareSlot
             
-            #starSlot = 0
-            #circleSlot = 0
-            #triangleSlot = 0
-            #squareSlot = 0
+            starSlotFull = False
+            circleSlotFull = False
+            triangleSlotFull = False
+            squareSlotFull = False
+            
+            
+            starSlot = 0
+            circleSlot = 0
+            triangleSlot = 0
+            squareSlot = 0
             
             for i in range(0,4):
-                try:
-                    returnVal1 = func_timeout(0.75, scan_star)
-                except FunctionTimedOut:
-                    print("scan_star() could terminated\n")
-                
-                try:
-                    returnVal2 = func_timeout(0.75, scan_circle)
-                except FunctionTimedOut:
-                    print("scan_circle() terminated\n")
-                
-                try:
-                    returnVal3 = func_timeout(0.75, scan_triangle)
-                except FunctionTimedOut:
-                    print("scan_triangle() terminated\n")
-                
-                try:
-                    returnVal4 = func_timeout(0.75, scan_square)
-                except FunctionTimedOut:
-                    print("scan_square() terminated\n")
+                if i > 0 and starSlot == 0:
+                    try:
+                        returnVal1 = func_timeout(1, scan_star)
+                    except FunctionTimedOut:
+                        #print("scan_star() terminated\n")
+                        print(" ")
+                    
+                if i > 0 and circleSlot == 0:
+                    try:
+                        returnVal2 = func_timeout(1, scan_circle)
+                    except FunctionTimedOut:
+                        #print("scan_circle() terminated\n")
+                        print(" ")
+                    
+                if i > 0 and triangleSlot == 0:
+                    try:
+                        returnVal3 = func_timeout(1, scan_triangle)
+                    except FunctionTimedOut:
+                        #print("scan_triangle() terminated\n")
+                        print(" ")
+                    
+                if i > 0 and squareSlot == 0:
+                    try:
+                        returnVal4 = func_timeout(1, scan_square)
+                    except FunctionTimedOut:
+                        #print("scan_square() terminated\n")
+                        print(" ")
 
             if (starSlot == 0):
                 starSlotPrev = 0
@@ -836,78 +850,89 @@ class GameWidget(QWidget):
             if (squareSlot == 0):
                 squareSlotPrev = 0
 
-            print("SLOT CONTAINERS: ")
-            print("STAR: \t\t ", starSlot)
-            print("CIRCLE: \t ", circleSlot)
-            print("TRIANGLE: \t ", triangleSlot)
-            print("SQUARE: \t ", squareSlot)   
+            print("SLOT CONTAINERS: \n")
+            print("STAR: \t\t\t ", starSlot)
+            print("PREVIOUS STAR: \t\t ", starSlotPrev)
+
+            print("CIRCLE: \t\t ", circleSlot)
+            print("PREVIOUS CIRCLE: \t ", circleSlotPrev)
+            
+            print("TRIANGLE: \t\t ", triangleSlot)
+            print("PREVIOUS TRIANGLE: \t ", triangleSlotPrev)
+            
+            print("SQUARE: \t\t ", squareSlot)
+            print("PREVIOUS SQUARE: \t ", squareSlotPrev)   
+            
+            
             
             if (starSlotPrev != starSlot):
                 contentsChanged = True
                 placedObject = starSlot
-            if (circleSlotPrev != circleSlot):
+            elif (circleSlotPrev != circleSlot):
                 contentsChanged = True
                 placedObject = circleSlot
-            if (triangleSlotPrev != triangleSlot):
+            elif (triangleSlotPrev != triangleSlot):
                 contentsChanged = True
                 placedObject = triangleSlot
-            if (squareSlotPrev != squareSlot):
+            elif (squareSlotPrev != squareSlot):
                 contentsChanged = True
                 placedObject = squareSlot     
-        
-            
-            if placedObject == promptObject:
-                print("Correct!")
-                newPrompt()
             else:
-                # else figure out what color it is, to set correct/incorrect color flag
-                if placedObject in redList:
-                    placedColor = 0
-                elif placedObject in yellowList:
-                    placedColor = 1
-                elif placedObject in greenList:
-                    placedColor = 2
-                elif placedObject in blueList:
-                    placedColor = 3
-                # same with shape
-                if placedObject in starList:
-                    placedShape = 0
-                elif placedObject in circleList:
-                    placedShape = 1
-                elif placedObject in triangleList:
-                    placedShape = 2
-                elif placedObject in squareList:
-                    placedShape = 3
+                contentsChanged = False
+        
+            if contentsChanged:
+                if placedObject == promptObject:
+                    print("Correct!")
+                    newPrompt()
+                else:
+                    # else figure out what color it is, to set correct/incorrect color flag
+                    if placedObject in redList:
+                        placedColor = 0
+                    elif placedObject in yellowList:
+                        placedColor = 1
+                    elif placedObject in greenList:
+                        placedColor = 2
+                    elif placedObject in blueList:
+                        placedColor = 3
+                    # same with shape
+                    if placedObject in starList:
+                        placedShape = 0
+                    elif placedObject in circleList:
+                        placedShape = 1
+                    elif placedObject in triangleList:
+                        placedShape = 2
+                    elif placedObject in squareList:
+                        placedShape = 3
 
-                # if color of object matches prompt
-                if placedColor == promptColor:
-                    correctColor = True
-                else:
-                    correctColor = False
+                    # if color of object matches prompt
+                    if placedColor == promptColor:
+                        correctColor = True
+                    else:
+                        correctColor = False
+                    
+                    # if shape of object matches prompt
+                    if placedShape == promptShape:
+                        correctShape = True
+                    else:
+                        correctShape = False
                 
-                # if shape of object matches prompt
-                if placedShape == promptShape:
-                    correctShape = True
-                else:
-                    correctShape = False
-            
-            # errors
-            # 0 = no errors
-            # 1 = wrong shape
-            # 2 = wrong color
-            # 3 = wrong shape and color
-            # 4 = full drawer
-                
-            # handle flags
-            if not correctShape and not correctColor: 
-                self.notifBuffer.setText("3")
-                currentTimer = 0
-            elif not correctShape and correctColor:
-                self.notifBuffer.setText("1")
-                currentTimer = 0
-            elif correctShape and not correctColor:
-                self.notifBuffer.setText("2")
-                currentTimer = 0
+                # errors
+                # 0 = no errors
+                # 1 = wrong shape
+                # 2 = wrong color
+                # 3 = wrong shape and color
+                # 4 = full drawer
+                    
+                # handle flags
+                if not correctShape and not correctColor: 
+                    self.notifBuffer.setText("3")
+                    currentTimer = 0
+                elif not correctShape and correctColor:
+                    self.notifBuffer.setText("1")
+                    currentTimer = 0
+                elif correctShape and not correctColor:
+                    self.notifBuffer.setText("2")
+                    currentTimer = 0
 
 
             print("correctColor: ", correctColor)
@@ -1085,6 +1110,7 @@ class WindowSystem(QMainWindow):
                 self.Game.TimerLabel.setText("Time Remaining: No Limit")
                 
             GameJustStarted = True
+            
 
         def resetGame():
 
